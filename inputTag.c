@@ -2,6 +2,366 @@
 //입력 함수
 extern int m_srl, d_srl, a_srl; //마지막 시리얼 넘버 저장 전역 변수
 
+int excludeSameRecord(void * ptr, char * compareString, Type type){
+  if(type == t_movie){
+    MOVIE * moviePointer = (MOVIE*)ptr;
+    while(moviePointer->next != NULL){
+      if(strcmp(compareString, moviePointer->title) == 0) return 0;
+      moviePointer = moviePointer->next;
+    }
+  }
+  else if(type == t_director){
+    DIR_ACTOR * directorPointer = ((DIR_ACTOR*)ptr);
+    while(directorPointer->next != NULL){
+      if(strcmp(compareString, directorPointer->name) == 0) return 0;
+      directorPointer= directorPointer->next;
+    }
+  }
+  else if(type == t_actor){
+    DIR_ACTOR * actorPointer = (DIR_ACTOR*)ptr;
+    while(actorPointer->next != NULL){
+      if(strcmp(compareString, actorPointer->name) == 0) return 0;
+      actorPointer = actorPointer->next;
+    }
+  }
+  return 1;
+}
+
+void add(FILE * fp, void * ptr, Type type){
+  if(type == t_movie){
+    fp=fopen("movie_log.txt","at");
+    char *title,*genre,*director,*actors;
+    int year,runtime;
+    printf("title > ");
+    title=Scan_log();
+    printf("genre > ");
+    genre=Scan_log();
+    printf("director > ");
+    director=Scan_log();
+    printf("year > ");
+    scanf("%d",&year);
+    while(getchar()!='\n');
+    printf("runtime > ");
+    scanf("%d",&runtime);
+    while(getchar()!='\n');
+    printf("actors > ");
+    actors=Scan_log();
+    //////////////// 같은 영화 제목 제외 ////////////////
+    MOVIE * moviePointer = (MOVIE*)ptr;
+    if(excludeSameRecord(moviePointer, title, t_movie) != 0){
+      m_srl++;
+      fprintf(fp,"add:%d:%s:%s:%s:%d:%d:%s\n",m_srl,title,genre,director,year,runtime,actors);
+    }
+    else{
+      printf("same : %s_%s\n",title, moviePointer->title);  // test 출력
+      printf("@@You have the same record in movie list.\n");
+      printf("%d:%s:%s:%s:%d:%d:",moviePointer->srl_num,moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
+      while(1){
+        printf("%s", moviePointer->actors->data_at);
+        if(moviePointer->actors->next == NULL)
+          break;
+        printf(",");
+        moviePointer->actors = moviePointer->actors->next;
+      }
+      printf("\n");
+      printf("@@ Do you want to add any way? (Y/N) ");
+      char ch;
+      scanf(" %c",&ch);
+      getchar();
+      if(ch=='Y' || ch=='y'){
+        m_srl++;
+        fprintf(fp,"add:%d:%s:%s:%s:%d:%d:%s\n",m_srl,title,genre,director,year,runtime,actors);
+      }
+      if(ch=='N' || ch=='n')
+        return;
+    }
+    fclose(fp);
+  }
+  else if(type == t_director){
+    fp=fopen("director_log.txt","at");
+    char *name,sex,*best_movies;
+    int birth;
+    printf("name > ");
+    name=Scan_log();
+    printf("sex(M/F) > ");
+    scanf("%c",&sex);
+    while(getchar()!='\n');
+    printf("birth(Only 8numbers) > ");
+    scanf("%d",&birth);
+    while(getchar()!='\n');
+    printf("best_movies > ");
+    best_movies=Scan_log();
+    //////////////// 같은 감독 이름 제외 ////////////////
+    DIR_ACTOR * directorPointer = (DIR_ACTOR*)ptr;
+    if(excludeSameRecord(directorPointer, name, t_director) != 0){
+      d_srl++;
+      fprintf(fp,"add:%d:%s:%c:%d:%s\n",d_srl,name,sex,birth,best_movies);
+    }
+    else{
+      printf("same : %s_%s\n",name, directorPointer->name);  // test 출력
+      printf("@@You have the same record in director list.\n");
+      printf("%d:%s:%s:%d:",directorPointer->srl_num,directorPointer->name,directorPointer->sex,directorPointer->birth);
+      while(1){
+        printf("%s", directorPointer->best_movies->data_at);
+        if(directorPointer->best_movies->next == NULL){
+          break;
+        }
+        printf(",");
+        directorPointer->best_movies = directorPointer->best_movies->next;
+      }
+      printf("\n");
+      printf("@@ Do you want to add any way? (Y/N) ");
+      char ch;
+      scanf(" %c",&ch);
+      getchar();
+      if(ch=='Y' || ch=='y'){
+        d_srl++;
+        fprintf(fp,"add:%d:%s:%c:%d:%s\n",d_srl,name,sex,birth,best_movies);
+      }
+      if(ch=='N' || ch=='n')
+        return;
+    }
+    fclose(fp);
+  }
+  else if (type == t_actor){
+    fp=fopen("actor_log.txt","at");
+    char *name,sex,*best_movies;
+    int birth;
+    printf("name > ");
+    name=Scan_log();
+    printf("sex(M/F) > ");
+    scanf("%c",&sex);
+    while(getchar()!='\n');
+    printf("birth(Only 8numbers) > ");
+    scanf("%d",&birth);
+    while(getchar()!='\n');
+    printf("best_movies > ");
+    best_movies=Scan_log();
+    //////////////// 같은 배우 이름 제외 ////////////////
+    DIR_ACTOR * actorPointer = (DIR_ACTOR*)ptr;
+    if(excludeSameRecord(actorPointer, name, t_director) != 0){
+      a_srl++;
+      fprintf(fp,"add:%d:%s:%c:%d:%s\n",a_srl,name,sex,birth,best_movies);
+    }
+    else{
+      printf("same : %s_%s\n",name, actorPointer->name);  // test 출력
+      printf("@@You have the same record in director list.\n");
+      printf("%d:%s:%s:%d:",actorPointer->srl_num,actorPointer->name,actorPointer->sex,actorPointer->birth);
+      while(1){
+        printf("%s", actorPointer->best_movies->data_at);
+        if(actorPointer->best_movies->next == NULL){
+          break;
+        }
+        printf(",");
+        actorPointer->best_movies = actorPointer->best_movies->next;
+      }
+      printf("\n");
+      printf("@@ Do you want to add any way? (Y/N) ");
+      char ch;
+      scanf(" %c",&ch);
+      getchar();
+      if(ch=='Y' || ch=='y'){
+        a_srl++;
+        fprintf(fp,"add:%d:%s:%c:%d:%s\n",a_srl,name,sex,birth,best_movies);
+      }
+      if(ch=='N' || ch=='n')
+        return;
+    }
+    fclose(fp);
+  }
+}
+
+void update(FILE * fp, int srl, char * option, void * ptr, Type type){
+  if(type == t_movie){
+    char *title = "=",*genre = "=",*director = "=",*actors = "=";
+    char *year = "=", *runtime = "=";
+    int i = 0;
+    while(1){
+      if(*(option+i)=='t'){
+        printf("title > ");
+        title=Scan_log();
+      }
+      else if(*(option+i)=='g'){
+        printf("genre > ");
+        genre=Scan_log();
+      }
+      else if(*(option+i)=='d'){
+        printf("director > ");
+        director=Scan_log();
+      }
+      else if(*(option+i)=='y'){
+        printf("year > ");
+        year=Scan_log();
+      }
+      else if(*(option+i)=='r'){
+        printf("runtime > ");
+        runtime=Scan_log();
+      }
+      else if(*(option+i)=='a'){
+        printf("actors > ");
+        actors=Scan_log();
+      }
+      else if(*(option+i)=='\0'){
+        break;
+      }
+      else{
+        printf("Input format is not correct\nupdate m|d|a [option] num\n\t  m : [option] : t g d r y a\n");
+        return;
+      }
+      i++;
+    }
+    //////////////// 같은 영화 제목 제외 ////////////////
+    MOVIE * moviePointer = (MOVIE*)ptr;
+    if(excludeSameRecord(moviePointer, title, t_movie) != 0){
+      fprintf(fp,"update:%d:%s:%s:%s:%s:%s:%s\n",srl,title,genre,director,year,runtime,actors);
+    }
+    else{
+      printf("same : %s_%s\n",title, moviePointer->title);  // test 출력
+      printf("@@You have the same record in movie list.\n");
+      printf("%d:%s:%s:%s:%d:%d:",moviePointer->srl_num,moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
+      while(1){
+        printf("%s", moviePointer->actors->data_at);
+        if(moviePointer->actors->next == NULL)
+          break;
+        printf(",");
+        moviePointer->actors = moviePointer->actors->next;
+      }
+      printf("\n");
+      printf("@@ Do you want to add any way? (Y/N) ");
+      char ch;
+      scanf(" %c",&ch);
+      getchar();
+      if(ch=='Y' || ch=='y'){
+        m_srl++;
+        fprintf(fp,"update:%d:%s:%s:%s:%s:%s:%s\n",srl,title,genre,director,year,runtime,actors);
+      }
+      if(ch=='N' || ch=='n')
+        return;
+    }
+  }
+  else if(type == t_director){
+    char *name="=",sex='=',*best_movies="=",*birth="=";
+    int i = 0;
+    while(1){
+      if(*(option+i)=='n'){
+        printf("name > ");
+        name=Scan_log();
+      }
+      else if(*(option+i)=='s'){
+        printf("sex(M/F) > ");
+        scanf("%c",&sex);
+        fflush(stdin);
+      }
+      else if(*(option+i)=='b'){
+        printf("birth(Only 8numbers) > ");
+        scanf("%d",&birth);
+        while(getchar()!='\n');
+      }
+      else if(*(option+i)=='m'){
+        printf("best_movies > ");
+        best_movies=Scan_log();
+      }
+      else if(*(option+i)=='\0'){
+        break;
+      }
+      else{
+        printf("Input format is not correct\nupdate m|d|a [option] num\n\t  d|a : [option] : n b s m\n");
+        return;
+      }
+      i++;
+    }
+    //////////////// 같은 감독 이름 제외 ////////////////
+    DIR_ACTOR * directorPointer = (DIR_ACTOR*)ptr;
+    if(excludeSameRecord(directorPointer, name, t_director) != 0){
+      fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
+    }
+    else{
+      printf("same : %s_%s\n",name, directorPointer->name);  // test 출력
+      printf("@@You have the same record in director list.\n");
+      printf("%d:%s:%s:%d:",directorPointer->srl_num,directorPointer->name,directorPointer->sex,directorPointer->birth);
+      while(1){
+        printf("%s", directorPointer->best_movies->data_at);
+        if(directorPointer->best_movies->next == NULL){
+          break;
+        }
+        printf(",");
+        directorPointer->best_movies = directorPointer->best_movies->next;
+      }
+      printf("\n");
+      printf("@@ Do you want to add any way? (Y/N) ");
+      char ch;
+      scanf(" %c",&ch);
+      getchar();
+      if(ch=='Y' || ch=='y'){
+        d_srl++;
+        fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
+      }
+      if(ch=='N' || ch=='n')
+        return;
+    }
+  }
+  else if(type == t_actor){
+    char *name="=",sex='=',*best_movies="=",*birth="=";
+    int i = 0;
+    while(1){
+      if(*(option+i)=='n'){
+        printf("name > ");
+        name=Scan_log();
+      }
+      else if(*(option+i)=='s'){
+        printf("sex(M/F) > ");
+        scanf("%c",&sex);
+      }
+      else if(*(option+i)=='b'){
+        printf("birth(Only 8numbers) > ");
+        scanf("%d",&birth);
+        while(getchar()!='\n');
+      }
+      else if(*(option+i)=='m'){
+        printf("best_movies > ");
+        best_movies=Scan_log();
+      }
+      else if(*(option+i)=='\0'){
+        break;
+      }
+      else{
+        printf("Input format is not correct\nupdate m|d|a [option] num\n\t  d|a : [option] : n b s m\n");
+        return;
+      }
+      i++;
+    }
+    //////////////// 같은 배우 이름 제외 ////////////////
+    DIR_ACTOR * actorPointer = (DIR_ACTOR*)ptr;
+    if(excludeSameRecord(actorPointer, name, t_director) != 0){
+      fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
+    }
+    else{
+      printf("same : %s_%s\n",name, actorPointer->name);  // test 출력
+      printf("@@You have the same record in director list.\n");
+      printf("%d:%s:%s:%d:",actorPointer->srl_num,actorPointer->name,actorPointer->sex,actorPointer->birth);
+      while(1){
+        printf("%s", actorPointer->best_movies->data_at);
+        if(actorPointer->best_movies->next == NULL){
+          break;
+        }
+        printf(",");
+        actorPointer->best_movies = actorPointer->best_movies->next;
+      }
+      printf("\n");
+      printf("@@ Do you want to add any way? (Y/N) ");
+      char ch;
+      scanf(" %c",&ch);
+      getchar();
+      if(ch=='Y' || ch=='y'){
+        a_srl++;
+        fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
+      }
+      if(ch=='N' || ch=='n')
+        return;
+    }
+  }
+}
+
 char* changeColon(char* ptr, Type mode){
   char* returnPointer = (char*)malloc(1);
   *returnPointer = '\0';
