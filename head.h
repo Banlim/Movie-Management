@@ -46,6 +46,8 @@ char * read(FILE * fp, Type type);
 ////////////////////////////
 void Input_Tag(MOVIE *, DIR_ACTOR *, DIR_ACTOR *);
 void add(FILE * fp, void * ptr, Type type);
+void update(FILE * fp, int srl, char * option, void * ptr, Type type);
 void makeList(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr);
 ////////////////////////////
 void PrintOption(void * ptr, int srl, Type type);
+void saveOption(Type type, void * ptr, char * option, char * filename);

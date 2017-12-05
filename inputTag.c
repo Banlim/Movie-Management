@@ -72,6 +72,184 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
     else
       printf("\tInput format is not correct\n\tadd m|d|a\n");
   }
+  else if(strcmp(tag, "update") == 0){
+    if(num != 1 && num != 2){
+      op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
+      strcpy(op1, *(str+1));
+      if(strcmp(op1, "m") == 0){
+        fp=fopen("movie_log.txt","at");
+        if(num == 3){
+          op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
+          strcpy(op2, *(str+2));
+          srl = atoi(op2);
+          if(srl == 0){
+            printf("%s is not number\n", op2);
+            return;
+          }
+          op3 = "tgdyra";
+          update(fp, srl, op3, movie, t_movie);
+          printf("@@ Done.\n");
+        }
+        else if(num == 4){
+          op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
+          strcpy(op2, *(str+2));
+          op3 = (char*)malloc(sizeof(char)*(strlen(*str+3)+1));
+          strcpy(op3, *(str+3));
+          srl = atoi(op3);
+          if(srl == 0){
+            printf("%s is not number\n", op3);
+            return;
+          }
+          update(fp, srl, op2, movie, t_movie);
+          printf("@@ Done.\n");
+        }
+        else
+          printf("Input format is not correct\nupdate m|d|a [option] num\n\t[option] : t g d r y a\n");
+        fclose(fp);
+      }
+      else if(strcmp(op1, "d") == 0){
+        fp=fopen("director_log.txt","at");
+        if(num == 3){
+          op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
+          strcpy(op2, *(str+2));
+          srl = atoi(op2);
+          if(srl == 0){
+            printf("%s is not number\n", op2);
+            return;
+          }
+          op3 = "nsbm";
+          update(fp, srl, op3, director, t_director);
+          printf("@@ Done.\n");
+        }
+        else if(num == 4){
+          op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
+          strcpy(op2, *(str+2));
+          op3 = (char*)malloc(sizeof(char)*(strlen(*str+3)+1));
+          strcpy(op3, *(str+3));
+          srl = atoi(op3);
+          if(srl == 0){
+            printf("%s is not number\n", op3);
+            return;
+          }
+          update(fp, srl, op2, director, t_director);
+          printf("@@ Done.\n");
+        }
+        else
+          printf("Input format is not correct\nupdate m|d|a [option] num\n\t[option] : n s b m\n");
+        fclose(fp);
+      }
+      else if(strcmp(op1, "a") == 0){
+        fp=fopen("actor_log.txt","at");
+        if(num == 3){
+          op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
+          strcpy(op2, *(str+2));
+          srl = atoi(op2);
+          if(srl == 0){
+            printf("%s is not number\n", op2);
+            return;
+          }
+          op3 = "nsbm";
+          update(fp, srl, op3, actor, t_actor);
+          printf("@@ Done.\n");
+        }
+        else if(num == 4){
+          op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
+          strcpy(op2, *(str+2));
+          op3 = (char*)malloc(sizeof(char)*(strlen(*str+3)+1));
+          strcpy(op3, *(str+3));
+          i = 0;
+          srl = atoi(op3);
+          if(srl == 0){
+            printf("%s is not number\n", op3);
+            return;
+          }
+          update(fp, srl, op2, actor, t_actor);
+          printf("@@ Done.\n");
+        }
+        else
+          printf("Input format is not correct\nupdate m|d|a [option] num\n\t[option] : n s b m\n");
+        fclose(fp);
+      }
+      else
+        printf("Input format is not correct\nupdate m|d|a [option] num\n\t  m : [option] : t g d r y a\n\td|a : [option] : n s b m\n");
+    }
+    else
+      printf("Input format is not correct\nupdate m|d|a [option] num\n\t  m : [option] : t g d r y a\n\td|a : [option] : n s b m\n");
+  }
+  else if(strcmp(tag, "delete") == 0){
+    if(num == 3){
+      op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
+      strcpy(op1, *(str+1));
+      op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
+      strcpy(op2, *(str+2));
+      srl = atoi(op2);
+      if(srl == 0){
+        printf("%s is not number\n", op2);
+        return;
+      }
+      if(strcmp(op1, "m") == 0){
+        while(1){
+          if(movie->srl_num == srl){
+            break;
+          }
+          if(movie->next == NULL){
+            break;
+          }
+          movie = movie->next;
+        }
+        if(movie->srl_num != srl){
+          printf("@@ No sush record.\n");
+          return ;
+        }
+        fp = fopen("movie_log.txt", "at");
+        fprintf(fp, "delete:%d::::::\n", srl);
+        printf("@@ Done.\n");
+        fclose(fp);
+      }
+      else if(strcmp(op1, "d") == 0){
+        while(1){
+          if(director->srl_num == srl){
+            break;
+          }
+          if(director->next == NULL){
+            break;
+          }
+          director = director->next;
+        }
+        if(director->srl_num != srl){
+          printf("@@ No sush record.\n");
+          return ;
+        }
+        fp = fopen("director_log.txt", "at");
+        fprintf(fp, "delete:%d::::\n", srl);
+        printf("@@ Done.\n");
+        fclose(fp);
+      }
+      else if(strcmp(op1, "a") == 0){
+        while(1){
+          if(actor->srl_num == srl){
+            break;
+          }
+          if(actor->next == NULL){
+            break;
+          }
+          actor = actor->next;
+        }
+        if(actor->srl_num != srl){
+          printf("@@ No sush record.\n");
+          return ;
+        }
+        fp = fopen("actor_log.txt", "at");
+        fprintf(fp, "delete:%d::::\n", srl);
+        printf("@@ Done.\n");
+        fclose(fp);
+      }
+      else
+        printf("'%s' is not correct option\noption : m d a\n", op1);
+    }
+    else
+      printf("Input format is not correct\ndelete m|d|a num\n");
+  }
   else if(strcmp(tag, "print") == 0){ ////////////////////////////////////////////////////////////////
     if(num == 3){
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
@@ -92,6 +270,111 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
     }
     else
       printf("Input format is not correct\nprint m|d|a num\n");
+  }
+  else if(strcmp(tag, "save") == 0){
+    if(num == 2){
+      op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
+      strcpy(op1, *(str+1));
+      if(strcmp(op1, "m") == 0){
+        saveOption(t_movie, movie, "tgdyra", "movie_list.txt");
+        printf("@@ Done.\n");
+      }
+      else if(strcmp(op1, "d") == 0){
+        saveOption(t_director, director, "nsbm", "director_list.txt");
+        printf("@@ Done.\n");
+      }
+      else if(strcmp(op1, "a") == 0){
+        saveOption(t_actor, actor, "nsbm", "actor_list.txt");
+        printf("@@ Done.\n");
+      }
+      else
+      printf("Input format is not correct\nsave m|d|a [option] [-f file_name]\n");
+    }
+    else if(num == 3){ //option
+      op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
+      strcpy(op1, *(str+1));
+      if(*(*(str+2)) == '-'){
+        op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)));
+        strcpy(op2, *(str+2)+1);
+      }
+      else{
+        printf("The options are written like '-%s'.\n",*(str+2));
+        return;
+      }
+      if(strcmp(op1, "m") == 0){
+        saveOption(t_movie, movie, op2, "movie_list.txt");
+        printf("@@ Done.\n");
+      }
+      else if(strcmp(op1, "d") == 0){
+        saveOption(t_director, director, op2, "director_list.txt");
+        printf("@@ Done.\n");
+      }
+      else if(strcmp(op1, "a") == 0){
+        saveOption(t_actor, actor, op2, "actor_list.txt");
+        printf("@@ Done.\n");
+      }
+      else
+        printf("Input format is not correct\nsave m|d|a [option] [-f file_name]\n");
+    }
+    else if(num == 4){ //-f filename
+      op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
+      strcpy(op1, *(str+1));
+      op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
+      strcpy(op2, *(str+2));
+      op3 = (char*)malloc(sizeof(char)*(strlen(*str+3)+5));
+      strcpy(op3, *(str+3));
+      strcat(op3, ".txt");
+      if(strcmp(op2, "-f") == 0){
+        if(strcmp(op1, "m") == 0){
+          saveOption(t_movie, movie, "tgdrya", op3);
+          printf("@@ Done.\n");
+        }
+        else if(strcmp(op1, "d") == 0){
+          saveOption(t_director, director, "nsbm", op3);
+          printf("@@ Done.\n");
+        }
+        else if(strcmp(op1, "a") == 0){
+          saveOption(t_actor, actor, "nsbm", op3);
+          printf("@@ Done.\n");
+        }
+      }
+      else
+        printf("Input format is not correct\nsave m|d|a [option] [-f file_name]\n");
+    }
+    else if(num == 5){ //option -f filename
+      op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
+      strcpy(op1, *(str+1));
+      if(*(*(str+2)) == '-'){
+        op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)));
+        strcpy(op2, *(str+2)+1);
+      }
+      else{
+        return;
+      }
+      op3 = (char*)malloc(sizeof(char)*(strlen(*str+3)+1));
+      strcpy(op3, *(str+3));
+      op4 = (char*)malloc(sizeof(char)*(strlen(*str+4)+5));
+      strcpy(op4, *(str+4));
+      strcat(op4, ".txt");
+      if(strcmp(op3, "-f") == 0){
+        if(strcmp(op1, "m") == 0){
+          saveOption(t_movie, movie, op2, op4);
+          printf("@@ Done.\n");
+        }
+        else if(strcmp(op1, "d") == 0){
+          saveOption(t_director, director, op2, op4);
+          printf("@@ Done.\n");
+        }
+        else if(strcmp(op1, "a") == 0){
+          saveOption(t_actor, actor, op2, op4);
+          printf("@@ Done.\n");
+        }
+      }
+      else
+      printf("Input format is not correct\nsave m|d|a [option] [-f file_name]\n");
+    }
+    else
+      printf("Input format is not correct\nsave m|d|a [option] [-f file_name]\n");
   }
   else
     printf("'%s' is not correct tag\ntag : search, print, add, update, delete, sort, save, end\n", tag);
