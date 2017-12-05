@@ -175,6 +175,240 @@ void add(FILE * fp, void * ptr, Type type){
     fclose(fp);
   }
 }
+// update 옵션 함수
+void update(FILE * fp, int srl, char * option, void * ptr, Type type){
+  if(type == t_movie){
+    MOVIE * moviePointer = (MOVIE*)ptr;
+    char *title = "=",*genre = "=",*director = "=",*actors = "=";
+    char *year = "=", *runtime = "=";
+    int i = 0;
+    while(1){
+      if(moviePointer->srl_num == srl){
+        break;
+      }
+      if(moviePointer->next == NULL){
+        break;
+      }
+      moviePointer = moviePointer->next;
+    }
+    if(moviePointer->srl_num != srl){
+      printf("@@ No sush record.\n");
+      return ;
+    }
+    while(1){
+      if(*(option+i)=='t'){
+        printf("title > ");
+        title=Scan_log();
+      }
+      else if(*(option+i)=='g'){
+        printf("genre > ");
+        genre=Scan_log();
+      }
+      else if(*(option+i)=='d'){
+        printf("director > ");
+        director=Scan_log();
+      }
+      else if(*(option+i)=='y'){
+        printf("year > ");
+        year=Scan_log();
+      }
+      else if(*(option+i)=='r'){
+        printf("runtime > ");
+        runtime=Scan_log();
+      }
+      else if(*(option+i)=='a'){
+        printf("actors > ");
+        actors=Scan_log();
+      }
+      else if(*(option+i)=='\0'){
+        break;
+      }
+      else{
+        printf("Input format is not correct\nupdate m|d|a [option] num\n\t  m : [option] : t g d r y a\n");
+        return;
+      }
+      i++;
+    }
+    moviePointer = (MOVIE*)ptr;
+    //////////////// 같은 영화 제목 제외 ////////////////
+    if(excludeSameRecord(moviePointer, title, t_movie) != 0){
+      fprintf(fp,"update:%d:%s:%s:%s:%s:%s:%s\n",srl,title,genre,director,year,runtime,actors);
+    }
+    else{
+      printf("same : %s_%s\n",title, moviePointer->title);  // test 출력
+      printf("@@You have the same record in movie list.\n");
+      printf("%d:%s:%s:%s:%d:%d:",moviePointer->srl_num,moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
+      while(1){
+        printf("%s", moviePointer->actors->data_at);
+        if(moviePointer->actors->next == NULL)
+        break;
+        printf(",");
+        moviePointer->actors = moviePointer->actors->next;
+      }
+      printf("\n");
+      printf("@@ Do you want to add any way? (Y/N) ");
+      char ch;
+      scanf(" %c",&ch);
+      getchar();
+      if(ch=='Y' || ch=='y'){
+        m_srl++;
+        fprintf(fp,"update:%d:%s:%s:%s:%s:%s:%s\n",srl,title,genre,director,year,runtime,actors);
+        printf("@@ Done.\n");
+      }
+      if(ch=='N' || ch=='n')
+      return;
+    }
+  }
+  else if(type == t_director){
+    DIR_ACTOR * directorPointer = (DIR_ACTOR*)ptr;
+    char *name="=",sex='=',*best_movies="=",*birth="=";
+    int i = 0;
+    while(1){
+      if(directorPointer->srl_num == srl){
+        break;
+      }
+      if(directorPointer->next == NULL){
+        break;
+      }
+      directorPointer = directorPointer->next;
+    }
+    if(directorPointer->srl_num != srl){
+      printf("@@ No sush record.\n");
+      return ;
+    }
+    while(1){
+      if(*(option+i)=='n'){
+        printf("name > ");
+        name=Scan_log();
+      }
+      else if(*(option+i)=='s'){
+        printf("sex(M/F) > ");
+        scanf("%c",&sex);
+        fflush(stdin);
+      }
+      else if(*(option+i)=='b'){
+        printf("birth(Only 8numbers) > ");
+        scanf("%d",&birth);
+        while(getchar()!='\n');
+      }
+      else if(*(option+i)=='m'){
+        printf("best_movies > ");
+        best_movies=Scan_log();
+      }
+      else if(*(option+i)=='\0'){
+        break;
+      }
+      else{
+        printf("Input format is not correct\nupdate m|d|a [option] num\n\t  d|a : [option] : n b s m\n");
+        return;
+      }
+      i++;
+    }
+    //////////////// 같은 감독 이름 제외 ////////////////
+    directorPointer = (DIR_ACTOR*)ptr;
+    if(excludeSameRecord(directorPointer, name, t_director) != 0){
+      fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
+    }
+    else{
+      printf("same : %s_%s\n",name, directorPointer->name);  // test 출력
+      printf("@@You have the same record in director list.\n");
+      printf("%d:%s:%s:%d:",directorPointer->srl_num,directorPointer->name,directorPointer->sex,directorPointer->birth);
+      while(1){
+        printf("%s", directorPointer->best_movies->data_at);
+        if(directorPointer->best_movies->next == NULL){
+          break;
+        }
+        printf(",");
+        directorPointer->best_movies = directorPointer->best_movies->next;
+      }
+      printf("\n");
+      printf("@@ Do you want to add any way? (Y/N) ");
+      char ch;
+      scanf(" %c",&ch);
+      getchar();
+      if(ch=='Y' || ch=='y'){
+        d_srl++;
+        fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
+      }
+      if(ch=='N' || ch=='n')
+      return;
+    }
+  }
+  else if(type == t_actor){
+    DIR_ACTOR * actorPointer = (DIR_ACTOR*)ptr;
+    char *name="=",sex='=',*best_movies="=",*birth="=";
+    int i = 0;
+    while(1){
+      if(actorPointer->srl_num == srl){
+        break;
+      }
+      if(actorPointer->next == NULL){
+        break;
+      }
+      actorPointer = actorPointer->next;
+    }
+    if(actorPointer->srl_num != srl){
+      printf("@@ No sush record.\n");
+      return ;
+    }
+    while(1){
+      if(*(option+i)=='n'){
+        printf("name > ");
+        name=Scan_log();
+      }
+      else if(*(option+i)=='s'){
+        printf("sex(M/F) > ");
+        scanf("%c",&sex);
+      }
+      else if(*(option+i)=='b'){
+        printf("birth(Only 8numbers) > ");
+        scanf("%d",&birth);
+        while(getchar()!='\n');
+      }
+      else if(*(option+i)=='m'){
+        printf("best_movies > ");
+        best_movies=Scan_log();
+      }
+      else if(*(option+i)=='\0'){
+        break;
+      }
+      else{
+        printf("Input format is not correct\nupdate m|d|a [option] num\n\t  d|a : [option] : n b s m\n");
+        return;
+      }
+      i++;
+    }
+    //////////////// 같은 배우 이름 제외 ////////////////
+    actorPointer = (DIR_ACTOR*)ptr;
+    if(excludeSameRecord(actorPointer, name, t_director) != 0){
+      fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
+    }
+    else{
+      printf("same : %s_%s\n",name, actorPointer->name);  // test 출력
+      printf("@@You have the same record in director list.\n");
+      printf("%d:%s:%s:%d:",actorPointer->srl_num,actorPointer->name,actorPointer->sex,actorPointer->birth);
+      while(1){
+        printf("%s", actorPointer->best_movies->data_at);
+        if(actorPointer->best_movies->next == NULL){
+          break;
+        }
+        printf(",");
+        actorPointer->best_movies = actorPointer->best_movies->next;
+      }
+      printf("\n");
+      printf("@@ Do you want to add any way? (Y/N) ");
+      char ch;
+      scanf(" %c",&ch);
+      getchar();
+      if(ch=='Y' || ch=='y'){
+        a_srl++;
+        fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
+      }
+      if(ch=='N' || ch=='n')
+      return;
+    }
+  }
+}
 // PrintOption
 void PrintOption(void * ptr, int srl, Type type){
   int i=1;
@@ -274,4 +508,92 @@ void PrintOption(void * ptr, int srl, Type type){
       Pointer = Pointer->next;
     }
   }
+}
+// save 옵션 함수
+void saveOption(Type type, void * ptr, char * option, char * filename){
+  FILE * fp = fopen(filename, "wt");
+  if(type == t_movie){
+    MOVIE * moviePointer = (MOVIE*)ptr;
+    while(1){
+      int i = 0;
+      while(1){
+        if(*(option+i) == 't'){
+          fprintf(fp, "%s", moviePointer->title);
+        }
+        else if(*(option+i) == 'g'){
+          fprintf(fp, "%s", moviePointer->genre);
+        }
+        else if(*(option+i) == 'd'){
+          fprintf(fp, "%s", moviePointer->director->data_at);
+        }
+        else if(*(option+i) == 'y'){
+          fprintf(fp, "%d", moviePointer->year);
+        }
+        else if(*(option+i) == 'r'){
+          fprintf(fp, "%d", moviePointer->runtime);
+        }
+        else if(*(option+i) == 'a'){
+          DATA_AT * movieActorsPointer = moviePointer->actors;
+          while(1){
+            fprintf(fp, "%s", movieActorsPointer->data_at);
+            if(movieActorsPointer->next == NULL){
+              break;
+            }
+            fprintf(fp, ",");
+            movieActorsPointer = movieActorsPointer->next;
+          }
+        }
+        if(*(option+i+1) == '\0'){
+          fprintf(fp, "\n");
+          break;
+        }
+        fprintf(fp, ":");
+        i++;
+      }
+      if(moviePointer->next == NULL){
+        break;
+      }
+      moviePointer = moviePointer->next;
+    }
+  }
+  else if(type == t_director || type == t_actor){
+    DIR_ACTOR * diractorPointer = (DIR_ACTOR*)ptr;
+    while(1){
+      int i = 0;
+      while(1){
+        if(*(option+i) == 'n'){
+          fprintf(fp, "%s", diractorPointer->name);
+        }
+        else if(*(option+i) == 's'){
+          fprintf(fp, "%s", diractorPointer->sex);
+        }
+        else if(*(option+i) == 'b'){
+          fprintf(fp, "%d", diractorPointer->birth);
+        }
+        else if(*(option+i) == 'm'){
+          DATA_AT * diractorBestMoviesPointer = diractorPointer->best_movies;
+          while(1){
+            fprintf(fp, "%s", diractorBestMoviesPointer->data_at);
+            if(diractorBestMoviesPointer->next == NULL){
+              break;
+            }
+            fprintf(fp, ",");
+            diractorBestMoviesPointer = diractorBestMoviesPointer->next;
+          }
+        }
+        if(*(option+i+1) == '\0'){
+          fprintf(fp, "\n");
+          break;
+        }
+        fprintf(fp, ":");
+        i++;
+      }
+      if(diractorPointer->next == NULL){
+        break;
+      }
+      diractorPointer = diractorPointer->next;
+    }
+  }
+  else  ;
+  fclose(fp);
 }
