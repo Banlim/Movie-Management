@@ -271,6 +271,102 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
     else
       printf("Input format is not correct\nprint m|d|a num\n");
   }
+  else if(strcmp(tag, "sort") == 0){
+    if(num == 2){
+      op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
+      strcpy(op1, *(str+1));
+      if(strcmp(op1, "m") == 0){
+        sortOption(t_movie, movie, "t", NULL);
+        printf("@@ Done.\n");
+      }
+      else if(strcmp(op1, "d") == 0){
+        sortOption(t_director, director, "n", NULL);
+        printf("@@ Done.\n");
+      }
+      else if(strcmp(op1, "a") == 0){
+        sortOption(t_actor, actor, "n", NULL);
+        printf("@@ Done.\n");
+      }
+      else
+        printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
+    }
+    else if(num == 3){ //option
+      op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
+      strcpy(op1, *(str+1));
+      op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
+      strcpy(op2, *(str+2));
+      if(strcmp(op1, "m") == 0){
+        sortOption(t_movie, movie, op2, NULL);
+        printf("@@ Done.\n");
+      }
+      else if(strcmp(op1, "d") == 0){
+        sortOption(t_director, director, op2, NULL);
+        printf("@@ Done.\n");
+      }
+      else if(strcmp(op1, "a") == 0){
+        sortOption(t_actor, actor, op2, NULL);
+        printf("@@ Done.\n");
+      }
+      else
+        printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
+    }
+    else if(num == 4){ //-f filename
+      op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
+      strcpy(op1, *(str+1));
+      op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
+      strcpy(op2, *(str+2));
+      op3 = (char*)malloc(sizeof(char)*(strlen(*str+3)+5));
+      strcpy(op3, *(str+3));
+      strcat(op3, ".txt");
+      if(strcmp(op2, "-f") == 0){
+        if(strcmp(op1, "m") == 0){
+          sortOption(t_movie, movie, "t", op3);
+          printf("@@ Done.\n");
+        }
+        else if(strcmp(op1, "d") == 0){
+          sortOption(t_director, director, "n", op3);
+          printf("@@ Done.\n");
+        }
+        else if(strcmp(op1, "a") == 0){
+          sortOption(t_actor, actor, "n", op3);
+          printf("@@ Done.\n");
+        }
+        else
+          printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
+      }
+      else
+        printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
+    }
+    else if(num == 5){ //option -f filename
+      op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
+      strcpy(op1, *(str+1));
+      op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
+      strcpy(op2, *(str+2));
+      op3 = (char*)malloc(sizeof(char)*(strlen(*str+3)+1));
+      strcpy(op3, *(str+3));
+      op4 = (char*)malloc(sizeof(char)*(strlen(*str+4)+5));
+      strcpy(op4, *(str+4));
+      strcat(op4, ".txt");
+      if(strcmp(op3, "-f") == 0){
+        if(strcmp(op1, "m") == 0){
+          sortOption(t_movie, movie, op2, op4);
+          printf("@@ Done.\n");
+        }
+        else if(strcmp(op1, "d") == 0){
+          sortOption(t_director, director, op2, op4);
+          printf("@@ Done.\n");
+        }
+        else if(strcmp(op1, "a") == 0){
+          sortOption(t_actor, actor, op2, op4);
+          printf("@@ Done.\n");
+        }
+      }
+      else
+        printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
+    }
+    else
+      printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
+  }
   else if(strcmp(tag, "save") == 0){
     if(num == 2){
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
