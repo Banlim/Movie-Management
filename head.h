@@ -43,13 +43,16 @@ DIR_ACTOR * read_da_log(DIR_ACTOR * daptr, Type type);
 MOVIE * delete_m(FILE * fp, MOVIE * mptr, int tmp_num);
 DIR_ACTOR * delete_da(FILE * fp, DIR_ACTOR * daptr, int tmp_num);
 char * read(FILE * fp, Type type);
+void linkLog(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr);
 ////////////////////////////
 void Input_Tag(MOVIE *, DIR_ACTOR *, DIR_ACTOR *);
 void add(FILE * fp, void * ptr, Type type);
 void update(FILE * fp, int srl, char * option, void * ptr, Type type);
 void makeList(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr);
 ////////////////////////////
+void Save_File();
 void PrintOption(void * ptr, int srl, Type type);
+void SearchOption(void * ptr, char * str, Type type, int num);
 void saveOption(Type type, void * ptr, char * option, char * filename);
 void sortOption(Type type, void * ptr, char * option, char * filename);
 ////////////////////////////

@@ -597,6 +597,262 @@ void saveOption(Type type, void * ptr, char * option, char * filename){
   else  ;
   fclose(fp);
 }
+// search 옵션 함수
+void SearchOption(void * ptr, char * str, Type type, int num){
+  char * tmp, * cmptmp;
+  int i=0,last=0, cmplast=0, cnt=0, strnum=0;
+  if(num == 0){  //search string
+    tmp = strstr(str, " ");
+    tmp+=1;
+  }
+  if(num == 1){
+    tmp = strstr(str, " ");
+    tmp+=1;
+    while(*(tmp) != ' '){
+      tmp+=1;
+    }
+    tmp+=1;
+  }
+  if(strcmp(tmp, "*")==0){
+    if(type == t_movie){
+      MOVIE * moviePointer = (MOVIE*)ptr;
+      printf("> Movie_list\n");
+      while(1){
+        printf("\t%d:%s:%s:%s:%d:%d:",moviePointer->srl_num, moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
+        while(1){
+          printf("%s", moviePointer->actors->data_at);
+          if(moviePointer->actors->next == NULL){
+            printf("\n");
+            break;
+          }
+          printf(", ");
+          moviePointer->actors = moviePointer->actors->next;
+        }
+        if(moviePointer->next == NULL){
+          break;
+        }
+        moviePointer = moviePointer->next;
+      }
+    }
+    if(type == t_director || type == t_actor){
+      DIR_ACTOR * daPointer = (DIR_ACTOR*)ptr;
+      if(type == t_director){
+        printf("> Director_list\n");
+      }
+      if(type == t_actor){
+        printf("> Actor_list\n");
+      }
+      while(1){
+        printf("\t%d:%s:%s:%d:",daPointer->srl_num, daPointer->name,daPointer->sex,daPointer->birth);
+        while(1){
+          printf("%s", daPointer->best_movies->data_at);
+          if(daPointer->best_movies->next == NULL){
+            printf("\n");
+            break;
+          }
+          printf(", ");
+          daPointer->best_movies = daPointer->best_movies->next;
+        }
+        if(daPointer->next == NULL){
+          break;
+        }
+        daPointer = daPointer->next;
+      }
+    }
+    return;
+  }
+  while(1){
+    if(*(tmp+i) == '*')
+      strnum++;
+    if(strnum == 2){
+      printf("' * ' can only be used once.\n");
+      return;
+    }
+    if(*(tmp+i) == '\0')
+        break;
+    i++;
+  }
+  if(type == t_movie){
+    MOVIE * moviePointer = (MOVIE*)ptr;
+    cnt=0;
+    printf("> Movie_list\n");
+    while(1){  // movie의 title
+      cmptmp=NULL;
+      cmptmp = (char*)malloc(sizeof(char)*(strlen(moviePointer->title)+1));
+      strcpy(cmptmp, moviePointer->title);
+      i=0;
+      while(1){ // movie의 title 비교 시작
+        if(*(cmptmp+i) == *(tmp+i) || *(tmp+i) == '?'){
+          if(*(tmp+i) == '\0' && *(cmptmp+i) == '\0'){
+            printf("\t%d:%s:%s:%s:%d:%d:",moviePointer->srl_num, moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
+            while(1){
+              printf("%s", moviePointer->actors->data_at);
+              if(moviePointer->actors->next == NULL){
+                printf("\n");
+                break;
+              }
+              printf(", ");
+              moviePointer->actors = moviePointer->actors->next;
+            }
+            cnt++;
+            break;
+          }
+          i++;
+          continue;
+        }
+        else if(*(tmp+i) == '*'){
+          last = strlen(tmp)-1;
+          cmplast = strlen(cmptmp)-1;
+          if(i==0){
+            while(last != 0){
+              if(*(cmptmp+cmplast) == *(tmp+last) || *(tmp+last) == '?'){
+                last--;
+                cmplast--;
+                continue;
+              }
+              else{
+                break;
+              }
+            }
+            if(last == 0){
+              printf("\t%d:%s:%s:%s:%d:%d:",moviePointer->srl_num, moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
+              while(1){
+                printf("%s", moviePointer->actors->data_at);
+                if(moviePointer->actors->next == NULL){
+                  printf("\n");
+                  break;
+                }
+                printf(", ");
+                moviePointer->actors = moviePointer->actors->next;
+              }
+              cnt++;
+            }
+            break;
+          }
+          else if(i == last){
+            printf("\t%d:%s:%s:%s:%d:%d:",moviePointer->srl_num, moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
+            while(1){
+              printf("%s", moviePointer->actors->data_at);
+              if(moviePointer->actors->next == NULL){
+                printf("\n");
+                break;
+              }
+              printf(", ");
+              moviePointer->actors = moviePointer->actors->next;
+            }
+            cnt++;
+            break;
+          }
+          else{
+            printf("Input format is not correct\nsearch [option] string\n[option] : -m -d -a\n");
+            return;
+          }
+        }
+        else{
+          break;
+        }
+      }
+      if(moviePointer->next == NULL)
+        break;
+      moviePointer = moviePointer->next;
+    }
+    if(cnt == 0)
+      printf("@@ No sush record.\n");
+  }
+  if(type == t_director || type == t_actor){
+    DIR_ACTOR * daPointer = (DIR_ACTOR*)ptr;
+    cnt=0;
+    if(type == t_director){
+      printf("> Director_list\n");
+    }
+    if(type == t_actor){
+      printf("> Actor_list\n");
+    }
+    while(1){  // movie의 title
+      cmptmp=NULL;
+      cmptmp = (char*)malloc(sizeof(char)*(strlen(daPointer->name)+1));
+      strcpy(cmptmp, daPointer->name);
+      i=0;
+      while(1){ // movie의 title 비교 시작
+        if(*(cmptmp+i) == *(tmp+i) || *(tmp+i) == '?'){
+          if(*(tmp+i) == '\0' && *(cmptmp+i) == '\0'){
+            printf("\t%d:%s:%s:%d:",daPointer->srl_num, daPointer->name,daPointer->sex,daPointer->birth);
+            while(1){
+              printf("%s", daPointer->best_movies->data_at);
+              if(daPointer->best_movies->next == NULL){
+                printf("\n");
+                break;
+              }
+              printf(", ");
+              daPointer->best_movies = daPointer->best_movies->next;
+            }
+            cnt++;
+            break;
+          }
+          i++;
+          continue;
+        }
+        else if(*(tmp+i) == '*'){
+          last = strlen(tmp)-1;
+          cmplast = strlen(cmptmp)-1;
+          if(i==0){
+            while(last != 0){
+              if(*(cmptmp+cmplast) == *(tmp+last) || *(tmp+last) == '?'){
+                last--;
+                cmplast--;
+                continue;
+              }
+              else{
+                break;
+              }
+            }
+            if(last == 0){
+              printf("\t%d:%s:%s:%d:",daPointer->srl_num, daPointer->name,daPointer->sex,daPointer->birth);
+              while(1){
+                printf("%s", daPointer->best_movies->data_at);
+                if(daPointer->best_movies->next == NULL){
+                  printf("\n");
+                  break;
+                }
+                printf(", ");
+                daPointer->best_movies = daPointer->best_movies->next;
+              }
+              cnt++;
+            }
+            break;
+          }
+          else if(i == last){
+            printf("\t%d:%s:%s:%d:",daPointer->srl_num, daPointer->name,daPointer->sex,daPointer->birth);
+            while(1){
+              printf("%s", daPointer->best_movies->data_at);
+              if(daPointer->best_movies->next == NULL){
+                printf("\n");
+                break;
+              }
+              printf(", ");
+              daPointer->best_movies = daPointer->best_movies->next;
+            }
+            cnt++;
+            break;
+          }
+          else{
+            printf("Input format is not correct\nsearch [option] string\n[option] : -m -d -a\n");
+            return;
+          }
+        }
+        else{
+          break;
+        }
+      }
+      if(daPointer->next == NULL)
+        break;
+      daPointer = daPointer->next;
+    }
+    if(cnt == 0)
+      printf("@@ No sush record.\n");
+  }
+  return;
+}
 // sort 옵션 함수
 void sortOption(Type type, void * ptr, char * option, char * filename){
   int i = 0;
@@ -769,7 +1025,7 @@ void sortOption(Type type, void * ptr, char * option, char * filename){
   else
     ;
 }
-// compare함수 //////////////////////////////
+// compare함수
 int compareOptionT(const void * ptr1, const void * ptr2){
   return strcmp((char*)(*(MOVIE**)ptr1)->title, (char*)(*(MOVIE**)ptr2)->title);
 }

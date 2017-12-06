@@ -3,7 +3,7 @@
 extern int m_srl, d_srl, a_srl; //마지막 시리얼 넘버 저장 전역 변수
 
 void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
-  char *tag=NULL, *op1=NULL, *op2=NULL, *op3=NULL;
+  char *tag=NULL, *op1=NULL, *op2=NULL, *op3=NULL, *op4=NULL;
   char ** str = NULL;
   char * tmp = NULL, * tmp_str = NULL;
   int i = 0, scanfNum = 0, num = 0, free_num = 0;
@@ -13,6 +13,7 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
   while(1){
     free(tmp);
     free(str);
+    free(searchTmp);
     tmp = NULL;
     str = NULL;
     tmp=(char *)malloc(sizeof(char)*200);
@@ -20,7 +21,9 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
     str=(char**)malloc(sizeof(char*)*(1));
     num=0;
     printf("(movie) ");
-    scanfNum = scanf("%[ a-zA-Z0-9*?-:]", tmp);
+    scanfNum = scanf("%[ a-zA-Z0-9*?-:_]", tmp);
+    searchTmp=(char*)malloc(sizeof(strlen(tmp))+1);
+    strcpy(searchTmp, tmp);
     while( getchar() != '\n' );
     //예외 처리
     if(scanfNum == 0){
@@ -271,6 +274,62 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
     else
       printf("Input format is not correct\nprint m|d|a num\n");
   }
+  else if(strcmp(tag, "search") == 0){ ////////////////////////////////////////////////////////////////
+    if(num == 1){
+      printf("Input format is not correct\nsearch [option] string\n[option] : -m -d -a\n");
+      return;
+    }
+    if(*(*(str+1)) != '-')
+      num = 2;
+    else
+      num = 3;
+    if(num == 2){  //search string
+      char * jdgtmp;
+      int strnum=0;
+      jdgtmp = strstr(searchTmp, " ");
+      jdgtmp+=1;
+      while(1){
+        if(*(jdgtmp+i) == '*')
+          strnum++;
+        if(strnum == 2){
+          printf("' * ' can only be used once.\n");
+          return;
+        }
+        if(*(jdgtmp+i) == '\0')
+            break;
+        i++;
+      }
+      SearchOption(movie, searchTmp, t_movie, 0);
+      SearchOption(director, searchTmp, t_director, 0);
+      SearchOption(actor, searchTmp, t_actor, 0);
+      printf("@@ Done.\n");
+    }
+    else if(num == 3){  // search [option] string
+      op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
+      strcpy(op1, *(str+1));
+      i=1;
+      while(i<4){
+        if(*(op1+i) == 'm'){
+          SearchOption(movie, searchTmp, t_movie, 1);
+        }
+        else if(*(op1+i) == 'd'){
+          SearchOption(director, searchTmp, t_director, 1);
+        }
+        else if(*(op1+i) == 'a'){
+          SearchOption(actor, searchTmp, t_actor, 1);
+        }
+        else if(*(op1+i) == '\0'){
+          break;
+        }
+        else{
+          printf("'%s' is not correct option\n[option] : -m|d|a\n", op1);
+          break;
+        }
+        i++;
+      }
+      printf("@@ Done.\n");
+    }
+  }
   else if(strcmp(tag, "sort") == 0){
     if(num == 2){
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
@@ -288,7 +347,7 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         printf("@@ Done.\n");
       }
       else
-        printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
+      ;
     }
     else if(num == 3){ //option
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
@@ -297,18 +356,13 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
       strcpy(op2, *(str+2));
       if(strcmp(op1, "m") == 0){
         sortOption(t_movie, movie, op2, NULL);
-        printf("@@ Done.\n");
       }
       else if(strcmp(op1, "d") == 0){
         sortOption(t_director, director, op2, NULL);
-        printf("@@ Done.\n");
       }
       else if(strcmp(op1, "a") == 0){
         sortOption(t_actor, actor, op2, NULL);
-        printf("@@ Done.\n");
       }
-      else
-        printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
     }
     else if(num == 4){ //-f filename
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
@@ -321,21 +375,16 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
       if(strcmp(op2, "-f") == 0){
         if(strcmp(op1, "m") == 0){
           sortOption(t_movie, movie, "t", op3);
-          printf("@@ Done.\n");
         }
         else if(strcmp(op1, "d") == 0){
           sortOption(t_director, director, "n", op3);
-          printf("@@ Done.\n");
         }
         else if(strcmp(op1, "a") == 0){
           sortOption(t_actor, actor, "n", op3);
-          printf("@@ Done.\n");
         }
-        else
-          printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
       }
       else
-        printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
+      ;
     }
     else if(num == 5){ //option -f filename
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
@@ -350,22 +399,19 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
       if(strcmp(op3, "-f") == 0){
         if(strcmp(op1, "m") == 0){
           sortOption(t_movie, movie, op2, op4);
-          printf("@@ Done.\n");
         }
         else if(strcmp(op1, "d") == 0){
           sortOption(t_director, director, op2, op4);
-          printf("@@ Done.\n");
         }
         else if(strcmp(op1, "a") == 0){
           sortOption(t_actor, actor, op2, op4);
-          printf("@@ Done.\n");
         }
       }
       else
-        printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
+      ;
     }
     else
-      printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
+    ;
   }
   else if(strcmp(tag, "save") == 0){
     if(num == 2){
