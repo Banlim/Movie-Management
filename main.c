@@ -12,6 +12,8 @@ int main(){
   actor=read_da_log(actor,t_actor);
   makeList(movie, director, actor);
 
+  linkLog(movie,director,actor);
+  Save_File();
   //////////////////////////////////
   printf("You can use add, update, delete, search, sort, save, end commands.\n");
   ////////////////////////////////// start //////////////////////////////////
@@ -21,6 +23,8 @@ int main(){
     director=read_da_log(director,t_director);
     actor=read_da_log(actor,t_actor);
     makeList(movie, director, actor);
+    linkLog(movie,director,actor);
+    Save_File();
   }
   return 0;
 }

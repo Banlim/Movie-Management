@@ -77,3 +77,37 @@ void makeList(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
   }
   fclose(fp);
 }
+
+void Save_File(){
+  time_t now=time(NULL);
+  char backupFile[31];
+  char save[56];
+  int rc;
+  FILE *fp = fopen("movie_list.txt","rt");
+  if(fp != NULL){
+    strftime(backupFile,28,"movie_list.%Y%m%d%H%M.txt",localtime(&now));
+    sprintf(save,"cp movie_list.txt %s",backupFile);
+    rc=system(save);
+    if( rc != 0 )
+      printf( "정상적으로 수행되지 않았습니다.\n" );
+    fclose(fp);
+  }
+  fp = fopen("director_list.txt","rt");
+  if(fp != NULL){
+    strftime(backupFile,31,"director_list.%Y%m%d%H%M.txt",localtime(&now));
+    sprintf(save,"cp director_list.txt %s",backupFile);
+    rc=system(save);
+    if( rc != 0 )
+       printf( "정상적으로 수행되지 않았습니다.\n" );
+    fclose(fp);
+  }
+  fp = fopen("actor_list.txt","rt");
+  if(fp != NULL){
+    strftime(backupFile,31,"actor_list.%Y%m%d%H%M.txt",localtime(&now));
+    sprintf(save,"cp actor_list.txt %s",backupFile);
+    rc=system(save);
+    if( rc != 0 )
+       printf( "정상적으로 수행되지 않았습니다.\n" );
+    fclose(fp);
+  }
+}
