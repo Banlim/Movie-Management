@@ -51,3 +51,15 @@ void makeList(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr);
 ////////////////////////////
 void PrintOption(void * ptr, int srl, Type type);
 void saveOption(Type type, void * ptr, char * option, char * filename);
+void sortOption(Type type, void * ptr, char * option, char * filename);
+////////////////////////////
+int compareOptionT(const void * ptr1, const void * ptr2);
+int compareOptionG(const void * ptr1, const void * ptr2);
+int compareOptionD(const void * ptr1, const void * ptr2);
+int compareOptionY(const void * ptr1, const void * ptr2);
+int compareOptionR(const void * ptr1, const void * ptr2);
+int compareOptionA(const void * ptr1, const void * ptr2);
+int compareOptionN(const void * ptr1, const void * ptr2);
+int compareOptionS(const void * ptr1, const void * ptr2);
+int compareOptionB(const void * ptr1, const void * ptr2);
+int compareOptionM(const void * ptr1, const void * ptr2);

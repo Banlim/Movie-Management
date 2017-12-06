@@ -597,3 +597,281 @@ void saveOption(Type type, void * ptr, char * option, char * filename){
   else  ;
   fclose(fp);
 }
+// sort 옵션 함수
+void sortOption(Type type, void * ptr, char * option, char * filename){
+  int i = 0;
+  if(type == t_movie){
+    MOVIE ** pointerArray = (MOVIE**)malloc(sizeof(MOVIE*)*1);
+    MOVIE * crntMoviePtr = (MOVIE*)ptr;
+    while(1){
+      pointerArray = (MOVIE**)realloc(pointerArray, sizeof(MOVIE*)*(i+1));
+      *(pointerArray+i) = crntMoviePtr;
+      if(crntMoviePtr->next == NULL){
+        break;
+      }
+      crntMoviePtr = crntMoviePtr->next;
+      i++;
+    }
+    if(i+1 == 1){
+      return;
+    }
+    if(*(option) == 't'){
+      qsort(pointerArray, i+1, sizeof(MOVIE*), compareOptionT);
+    }
+    else if(*(option) == 'g'){
+      qsort(pointerArray, i+1, sizeof(MOVIE*), compareOptionG);
+    }
+    else if(*(option) == 'd'){
+      qsort(pointerArray, i+1, sizeof(MOVIE*), compareOptionD);
+    }
+    else if(*(option) == 'y'){
+      qsort(pointerArray, i+1, sizeof(MOVIE*), compareOptionY);
+    }
+    else if(*(option) == 'r'){
+      qsort(pointerArray, i+1, sizeof(MOVIE*), compareOptionR);
+    }
+    else if(*(option) == 'a'){
+      qsort(pointerArray, i+1, sizeof(MOVIE*), compareOptionA);
+    }
+    else{
+      return;
+    }
+    int j = 0;
+    if(filename == NULL){
+      while(1){
+        printf("%d:", (*(pointerArray+j))->srl_num);
+        printf("%s:", (*(pointerArray+j))->title);
+        printf("%s:", (*(pointerArray+j))->genre);
+        printf("%s:", (*(pointerArray+j))->director->data_at);
+        printf("%d:", (*(pointerArray+j))->year);
+        printf("%d:", (*(pointerArray+j))->runtime);
+        DATA_AT * pointerArrayActors = (*(pointerArray+j))->actors;
+        while(1){
+          printf("%s", pointerArrayActors->data_at);
+          if(pointerArrayActors->next == NULL){
+            printf("\n");
+            break;
+          }
+          printf(",");
+          pointerArrayActors = pointerArrayActors->next;
+        }
+        if(j == i){
+          break;
+        }
+        j++;
+      }
+    }
+    else{
+      FILE * fp = fopen(filename, "wt");
+      while(1){
+        fprintf(fp, "%d:", (*(pointerArray+j))->srl_num);
+        fprintf(fp, "%s:", (*(pointerArray+j))->title);
+        fprintf(fp, "%s:", (*(pointerArray+j))->genre);
+        fprintf(fp, "%s:", (*(pointerArray+j))->director->data_at);
+        fprintf(fp, "%d:", (*(pointerArray+j))->year);
+        fprintf(fp, "%d:", (*(pointerArray+j))->runtime);
+        DATA_AT * pointerArrayActors = (*(pointerArray+j))->actors;
+        while(1){
+          fprintf(fp, "%s", pointerArrayActors->data_at);
+          if(pointerArrayActors->next == NULL){
+            fprintf(fp, "\n");
+            break;
+          }
+          fprintf(fp, ",");
+          pointerArrayActors = pointerArrayActors->next;
+        }
+        if(j == i){
+          break;
+        }
+        j++;
+      }
+      fclose(fp);
+    }
+  }
+  else if(type == t_director || type == t_actor){
+    DIR_ACTOR ** pointerArray = (DIR_ACTOR**)malloc(sizeof(DIR_ACTOR*)*1);
+    DIR_ACTOR * crntDirActorPtr = (DIR_ACTOR*)ptr;
+    while(1){
+      pointerArray = (DIR_ACTOR**)realloc(pointerArray, sizeof(DIR_ACTOR*)*(i+1));
+      *(pointerArray+i) = crntDirActorPtr;
+      if(crntDirActorPtr->next == NULL){
+        break;
+      }
+      crntDirActorPtr = crntDirActorPtr->next;
+      i++;
+    }
+    if(i+1 == 1){
+      return;
+    }
+    if(*(option) == 'n'){
+      qsort(pointerArray, i+1, sizeof(DIR_ACTOR*), compareOptionN);
+    }
+    else if(*(option) == 's'){
+      qsort(pointerArray, i+1, sizeof(DIR_ACTOR*), compareOptionS);
+    }
+    else if(*(option) == 'b'){
+      qsort(pointerArray, i+1, sizeof(DIR_ACTOR*), compareOptionB);
+    }
+    else if(*(option) == 'm'){
+      qsort(pointerArray, i+1, sizeof(DIR_ACTOR*), compareOptionM);
+    }
+    else{
+      return;
+    }
+    int j = 0;
+    if(filename == NULL){
+      while(1){
+        printf("%d:", (*(pointerArray+j))->srl_num);
+        printf("%s:", (*(pointerArray+j))->name);
+        printf("%s:", (*(pointerArray+j))->sex);
+        printf("%d:", (*(pointerArray+j))->birth);
+        DATA_AT * pointerArrayBestMovies = (*(pointerArray+j))->best_movies;
+        while(1){
+          printf("%s", pointerArrayBestMovies->data_at);
+          if(pointerArrayBestMovies->next == NULL){
+            printf("\n");
+            break;
+          }
+          printf(",");
+          pointerArrayBestMovies = pointerArrayBestMovies->next;
+        }
+        if(j == i){
+          break;
+        }
+        j++;
+      }
+    }
+    else{
+      FILE * fp = fopen(filename, "wt");
+      while(1){
+        fprintf(fp, "%d:", (*(pointerArray+j))->srl_num);
+        fprintf(fp, "%s:", (*(pointerArray+j))->name);
+        fprintf(fp, "%s:", (*(pointerArray+j))->sex);
+        fprintf(fp, "%d:", (*(pointerArray+j))->birth);
+        DATA_AT * pointerArrayBestMovies = (*(pointerArray+j))->best_movies;
+        while(1){
+          fprintf(fp, "%s", pointerArrayBestMovies->data_at);
+          if(pointerArrayBestMovies->next == NULL){
+            fprintf(fp, "\n");
+            break;
+          }
+          fprintf(fp, ",");
+          pointerArrayBestMovies = pointerArrayBestMovies->next;
+        }
+        if(j == i){
+          break;
+        }
+        j++;
+      }
+      fclose(fp);
+    }
+  }
+  else
+    ;
+}
+// compare함수 //////////////////////////////
+int compareOptionT(const void * ptr1, const void * ptr2){
+  return strcmp((char*)(*(MOVIE**)ptr1)->title, (char*)(*(MOVIE**)ptr2)->title);
+}
+
+int compareOptionG(const void * ptr1, const void * ptr2){
+  return strcmp((char*)(*(MOVIE**)ptr1)->genre, (char*)(*(MOVIE**)ptr2)->genre);
+}
+
+int compareOptionD(const void * ptr1, const void * ptr2){
+  return strcmp((char*)((DATA_AT*)(*(MOVIE**)ptr1)->director)->data_at, (char*)((DATA_AT*)(*(MOVIE**)ptr2)->director)->data_at);
+}
+
+int compareOptionY(const void * ptr1, const void * ptr2){
+  if((int)(*(MOVIE**)ptr1)->year > (int)(*(MOVIE**)ptr2)->year){
+    return 1;
+  }
+  else if((int)(*(MOVIE**)ptr1)->year == (int)(*(MOVIE**)ptr2)->year){
+    return 0;
+  }
+  else{
+    return -1;
+  }
+}
+
+int compareOptionR(const void * ptr1, const void * ptr2){
+  if((int)(*(MOVIE**)ptr1)->runtime > (int)(*(MOVIE**)ptr2)->runtime){
+    return 1;
+  }
+  else if((int)(*(MOVIE**)ptr1)->runtime == (int)(*(MOVIE**)ptr2)->runtime){
+    return 0;
+  }
+  else{
+    return -1;
+  }
+}
+
+int compareOptionA(const void * ptr1, const void * ptr2){
+  DATA_AT * cmpPointer1 = (DATA_AT*)(*(MOVIE**)ptr1)->actors;
+  DATA_AT * cmpPointer2 = (DATA_AT*)(*(MOVIE**)ptr2)->actors;
+  while(1){
+    if(strcmp((char*)cmpPointer1->data_at, (char*)cmpPointer2->data_at) == 0){
+      if(cmpPointer1->next == NULL && cmpPointer2->next != NULL){
+        return -1;
+      }
+      else if(cmpPointer1->next != NULL && cmpPointer2->next == NULL){
+        return 1;
+      }
+      else if(cmpPointer1->next == NULL && cmpPointer2->next == NULL){
+        return 0;
+      }
+      else{
+        cmpPointer1 = cmpPointer1->next;
+        cmpPointer2 = cmpPointer2->next;
+      }
+    }
+    else{
+      return strcmp((char*)cmpPointer1->data_at, (char*)cmpPointer2->data_at);
+    }
+  }
+}
+
+int compareOptionN(const void * ptr1, const void * ptr2){
+  return strcmp((char*)(*(DIR_ACTOR**)ptr1)->name, (char*)(*(DIR_ACTOR**)ptr2)->name);
+}
+
+int compareOptionS(const void * ptr1, const void * ptr2){
+  return strcmp((char*)(*(DIR_ACTOR**)ptr1)->sex, (char*)(*(DIR_ACTOR**)ptr2)->sex);
+}
+
+int compareOptionB(const void * ptr1, const void * ptr2){
+  if((int)(*(DIR_ACTOR**)ptr1)->birth > (int)(*(DIR_ACTOR**)ptr2)->birth){
+    return 1;
+  }
+  else if((int)(*(DIR_ACTOR**)ptr1)->birth == (int)(*(DIR_ACTOR**)ptr2)->birth){
+    return 0;
+  }
+  else{
+    return -1;
+  }
+}
+
+int compareOptionM(const void * ptr1, const void * ptr2){
+  DATA_AT * cmpPointer1 = (DATA_AT*)(*(DIR_ACTOR**)ptr1)->best_movies;
+  DATA_AT * cmpPointer2 = (DATA_AT*)(*(DIR_ACTOR**)ptr2)->best_movies;
+  while(1){
+    if(strcmp((char*)cmpPointer1->data_at, (char*)cmpPointer2->data_at) == 0){
+      if(cmpPointer1->next == NULL && cmpPointer2->next != NULL){
+        return 1;
+      }
+      else if(cmpPointer1->next != NULL && cmpPointer2->next == NULL){
+        return -1;
+      }
+      else if(cmpPointer1->next == NULL && cmpPointer2->next == NULL){
+        return 0;
+      }
+      else{
+        cmpPointer1 = cmpPointer1->next;
+        cmpPointer2 = cmpPointer2->next;
+      }
+    }
+    else{
+      return strcmp((char*)cmpPointer1->data_at, (char*)cmpPointer2->data_at);
+    }
+  }
+}
