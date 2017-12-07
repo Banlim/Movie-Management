@@ -96,6 +96,10 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         else if(num == 4){
           op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
           strcpy(op2, *(str+2));
+          if(preArrange(op2, "tgdyra") == NULL){
+            printf("%s is not correct option\n", op2);
+            return;
+          }
           op3 = (char*)malloc(sizeof(char)*(strlen(*str+3)+1));
           strcpy(op3, *(str+3));
           srl = atoi(op3);
@@ -127,6 +131,10 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         else if(num == 4){
           op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
           strcpy(op2, *(str+2));
+          if(preArrange(op2, "nsbm") == NULL){
+            printf("%s is not correct option\n", op2);
+            return;
+          }
           op3 = (char*)malloc(sizeof(char)*(strlen(*str+3)+1));
           strcpy(op3, *(str+3));
           srl = atoi(op3);
@@ -158,6 +166,10 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         else if(num == 4){
           op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
           strcpy(op2, *(str+2));
+          if(preArrange(op2, "nsbm") == NULL){
+            printf("%s is not correct option\n", op2);
+            return;
+          }
           op3 = (char*)malloc(sizeof(char)*(strlen(*str+3)+1));
           strcpy(op3, *(str+3));
           i = 0;
@@ -354,6 +366,10 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
       strcpy(op1, *(str+1));
       op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
       strcpy(op2, *(str+2));
+      if(strlen(op2) != 1){
+        printf("Input option must be one\n");
+        return;
+      }
       if(strcmp(op1, "m") == 0){
         sortOption(t_movie, movie, op2, NULL);
       }
@@ -384,13 +400,17 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         }
       }
       else
-      ;
+        printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
     }
     else if(num == 5){ //option -f filename
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
       strcpy(op1, *(str+1));
       op2 = (char*)malloc(sizeof(char)*(strlen(*str+2)+1));
       strcpy(op2, *(str+2));
+      if(strlen(op2) != 1){
+        printf("Input option must be one\n");
+        return;
+      }
       op3 = (char*)malloc(sizeof(char)*(strlen(*str+3)+1));
       strcpy(op3, *(str+3));
       op4 = (char*)malloc(sizeof(char)*(strlen(*str+4)+5));
@@ -408,10 +428,10 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         }
       }
       else
-      ;
+        printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
     }
     else
-    ;
+      printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
   }
   else if(strcmp(tag, "save") == 0){
     if(num == 2){
@@ -491,6 +511,7 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         strcpy(op2, *(str+2)+1);
       }
       else{
+        printf("The options are written like '-%s'.\n",*(str+2));
         return;
       }
       op3 = (char*)malloc(sizeof(char)*(strlen(*str+3)+1));
@@ -529,4 +550,34 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
     *(str+num) = NULL;
     free_num++;
   }
+}
+
+char* preArrange(char* cmpstr, char* stdstr){
+  int cmpLoc = 0, stdLoc = 0, i = 0;
+  char * returnStr = (char*)malloc((strlen(stdstr)+1)*sizeof(char));
+  for(i = 0; i < strlen(stdstr); i++){
+    *(returnStr+i) = ' ';
+  }
+  *(returnStr+strlen(stdstr)) = '\0';
+  while(1){
+    if(*(cmpstr+cmpLoc) == '\0')
+      break;
+    stdLoc = 0;
+    while(1){
+      if(*(cmpstr+cmpLoc) == *(stdstr+stdLoc)){
+        if(*(returnStr+stdLoc) != *(stdstr+stdLoc))
+          *(returnStr+stdLoc) = *(stdstr+stdLoc);
+        else
+          return NULL;
+        cmpLoc++;
+        break;
+      }
+      else if(*(stdstr+stdLoc) == '\0')
+        return NULL;
+      else
+        stdLoc++;
+    }
+  }
+  cmpstr = (char*)realloc(cmpstr, (strlen(stdstr)+1)*sizeof(char));
+  strcpy(cmpstr, returnStr);
 }

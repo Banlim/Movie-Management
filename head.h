@@ -44,6 +44,7 @@ MOVIE * delete_m(FILE * fp, MOVIE * mptr, int tmp_num);
 DIR_ACTOR * delete_da(FILE * fp, DIR_ACTOR * daptr, int tmp_num);
 char * read(FILE * fp, Type type);
 void linkLog(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr);
+char* preArrange(char* cmpstr, char* stdstr);
 ////////////////////////////
 void Input_Tag(MOVIE *, DIR_ACTOR *, DIR_ACTOR *);
 void add(FILE * fp, void * ptr, Type type);
