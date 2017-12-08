@@ -217,6 +217,7 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         }
         fp = fopen("movie_log.txt", "at");
         fprintf(fp, "delete:%d::::::\n", srl);
+        readLog(fp, movie, &moviePos, t_movie);
         printf("@@ Done.\n");
         fclose(fp);
       }
@@ -236,6 +237,7 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         }
         fp = fopen("director_log.txt", "at");
         fprintf(fp, "delete:%d::::\n", srl);
+        readLog(fp, director, &directorPos, t_director);
         printf("@@ Done.\n");
         fclose(fp);
       }
@@ -255,6 +257,7 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         }
         fp = fopen("actor_log.txt", "at");
         fprintf(fp, "delete:%d::::\n", srl);
+        readLog(fp, actor, &actorPos, t_actor);
         printf("@@ Done.\n");
         fclose(fp);
       }
@@ -318,6 +321,10 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
     else if(num == 3){  // search [option] string
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
       strcpy(op1, *(str+1));
+      if(preArrange(op1 "-mda") == NULL){
+        printf("%s is not correct option\n", op1);
+        return;
+      }
       i=1;
       while(i<4){
         if(*(op1+i) == 'm'){
@@ -332,6 +339,7 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         else if(*(op1+i) == '\0'){
           break;
         }
+        else if(*(op1+i) == ' ')
         else{
           printf("'%s' is not correct option\n[option] : -m|d|a\n", op1);
           break;
@@ -358,7 +366,7 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         printf("@@ Done.\n");
       }
       else
-      ;
+        printf("'%s' is not correct option\n[option] : m|d|a\n", op1);
     }
     else if(num == 3){ //option
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
@@ -378,6 +386,8 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
       else if(strcmp(op1, "a") == 0){
         sortOption(t_actor, actor, op2, NULL);
       }
+      else
+        printf("'%s' is not correct option\n[option] : m|d|a\n", op1);
     }
     else if(num == 4){ //-f filename
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
@@ -397,6 +407,8 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         else if(strcmp(op1, "a") == 0){
           sortOption(t_actor, actor, "n", op3);
         }
+        else
+          printf("'%s' is not correct option\n[option] : m|d|a\n", op1);
       }
       else
         printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
@@ -425,6 +437,8 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         else if(strcmp(op1, "a") == 0){
           sortOption(t_actor, actor, op2, op4);
         }
+        else
+          printf("'%s' is not correct option\n[option] : m|d|a\n", op1);
       }
       else
         printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
@@ -463,14 +477,26 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         return;
       }
       if(strcmp(op1, "m") == 0){
+        if(preArrange(op2, "tgdyra") == NULL){
+          printf("%s is not correct option\n", op2);
+          return;
+        }
         saveOption(t_movie, movie, op2, "movie_list.txt");
         printf("@@ Done.\n");
       }
       else if(strcmp(op1, "d") == 0){
+        if(preArrange(op2, "nsbm") == NULL){
+          printf("%s is not correct option\n", op2);
+          return;
+        }
         saveOption(t_director, director, op2, "director_list.txt");
         printf("@@ Done.\n");
       }
       else if(strcmp(op1, "a") == 0){
+        if(preArrange(op2, "nsbm") == NULL){
+          printf("%s is not correct option\n", op2);
+          return;
+        }
         saveOption(t_actor, actor, op2, "actor_list.txt");
         printf("@@ Done.\n");
       }
@@ -498,6 +524,8 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
           saveOption(t_actor, actor, "nsbm", op3);
           printf("@@ Done.\n");
         }
+        else
+          printf("'%s' is not correct option\n[option] : m|d|a\n", op1);
       }
       else
         printf("Input format is not correct\nsave m|d|a [option] [-f file_name]\n");
@@ -520,17 +548,31 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
       strcat(op4, ".txt");
       if(strcmp(op3, "-f") == 0){
         if(strcmp(op1, "m") == 0){
+          if(preArrange(op2, "tgdrya") == NULL){
+            printf("%s is not correct option\n", op2);
+            return;
+          }
           saveOption(t_movie, movie, op2, op4);
           printf("@@ Done.\n");
         }
         else if(strcmp(op1, "d") == 0){
+          if(preArrange(op2, "nsbm") == NULL){
+            printf("%s is not correct option\n", op2);
+            return;
+          }
           saveOption(t_director, director, op2, op4);
           printf("@@ Done.\n");
         }
         else if(strcmp(op1, "a") == 0){
+          if(preArrange(op2, "nsbm") == NULL){
+            printf("%s is not correct option\n", op2);
+            return;
+          }
           saveOption(t_actor, actor, op2, op4);
           printf("@@ Done.\n");
         }
+        else
+          printf("'%s' is not correct option\n[option] : m|d|a\n", op1);
       }
       else
       printf("Input format is not correct\nsave m|d|a [option] [-f file_name]\n");
