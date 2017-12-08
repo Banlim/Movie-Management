@@ -38,11 +38,7 @@ typedef struct director_actor{ // 자기 참조 구조체 : 감독 &배우
 } DIR_ACTOR;
 
 ////////////////////////////
-MOVIE * read_movie_log(MOVIE * mptr);
-DIR_ACTOR * read_da_log(DIR_ACTOR * daptr, Type type);
-MOVIE * delete_m(FILE * fp, MOVIE * mptr, int tmp_num);
-DIR_ACTOR * delete_da(FILE * fp, DIR_ACTOR * daptr, int tmp_num);
-char * read(FILE * fp, Type type);
+void * readLog(FILE * fp, void * ptr, fpos_t * pos, Type type);
 void linkLog(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr);
 char* preArrange(char* cmpstr, char* stdstr);
 ////////////////////////////
@@ -69,4 +65,22 @@ int compareOptionA(const void * ptr1, const void * ptr2);
 int compareOptionN(const void * ptr1, const void * ptr2);
 int compareOptionS(const void * ptr1, const void * ptr2);
 int compareOptionB(const void * ptr1, const void * ptr2);
-int compareOptionM(const void * ptr1, const void * ptr2);
+int compareOptionM(const void * ptr1, const void * ptr2
+
+////////////////////////////
+#ifdef GLOBAL_DEF
+MOVIE * movie = NULL;
+DIR_ACTOR * director = NULL;
+DIR_ACTOR * actor = NULL;
+
+int m_srl=0, d_srl=0, a_srl=0; //마지막 시리얼 넘버 저장 전역 변수
+fpos_t moviePos=0, directorPos=0, actorPos=0; // 파일 위치 저장 전역 변수
+fpos_t *moviePosPtr=&moviePos, *directorPosPtr=&directorPos, *actorPosPtr=&actorPos;
+#else
+extern MOVIE * movie;
+extern DIR_ACTOR * director, * actor;
+
+extern int m_srl, d_srl, a_srl; //마지막 시리얼 넘버 저장 전역 변수
+extern fpos_t moviePos, directorPos, actorPos; // 파일 위치 저장 전역 변수
+extern fpos_t *moviePosPtr, *directorPosPtr, *actorPosPtr;
+#endif

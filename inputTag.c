@@ -1,6 +1,5 @@
 #include "head.h"
 //입력 함수
-extern int m_srl, d_srl, a_srl; //마지막 시리얼 넘버 저장 전역 변수
 
 void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
   char *tag=NULL, *op1=NULL, *op2=NULL, *op3=NULL, *op4=NULL;

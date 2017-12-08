@@ -1,7 +1,5 @@
 #include "head.h"
 
-extern int m_srl, d_srl, a_srl; //마지막 시리얼 넘버 저장 전역 변수
-
 char * read(FILE * fp, Type type){
   char * str = (char*)malloc(100);
   if(type == t_str){
@@ -18,20 +16,37 @@ char * read(FILE * fp, Type type){
   return str;
 }
 
-MOVIE * read_movie_log(MOVIE * mptr){
-  FILE * fp = fopen("movie_log.txt", "rt");
-  int tmp_num, up_cnt;
-  char * tmp_tag, * tmp_str;
-  MOVIE * p_mptr = NULL, * u_mptr;
-  MOVIE * c_mptr = mptr;
-  DATA_AT * c_atptr = mptr->actors;
-  while(1){
-    tmp_tag=read(fp, t_str);
-    fscanf(fp,"%d:",&tmp_num);
-    if(strcmp(tmp_tag, "update") == 0){
-      u_mptr = mptr;
-      while(u_mptr->srl_num < tmp_num){
-        u_mptr = u_mptr->next;
+void * readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
+  char * tag, * tmp_str;
+  int srlNum, tmp_num, up_cnt;
+  if(type == t_movie){
+    MOVIE *previousPointer=NULL, *moviePointer = (MOVIE*)ptr;
+    MOVIE *currentPointer=NULL, *updatePointer=NULL;
+    void *tmpPointer = NULL, *returnPointer = ptr;
+    DATA_AT *currentActorsPointer = moviePointer->actors;
+    previousPointer = moviePointer;
+    while(1){
+      if(previousPointer->next == NULL)
+        break;
+      previousPointer = previousPointer->next;
+    }
+    if(previousPointer->title == NULL){
+      previousPointer = NULL;
+      currentPointer = moviePointer;
+    }
+    if(*pos == 0)
+      fgetpos(fp, pos);
+    fsetpos(fp, pos);
+    tag=read(fp, t_str);
+    fscanf(fp, "%d:", &srlNum);
+    if(strcmp(tag, "update") == 0){
+      updatePointer = moviePointer;
+      while(1){
+        if(updatePointer->srl_num == srlNum)
+          break;
+        if(updatePointer->next == NULL)
+          break;
+        updatePointer = updatePointer->next;
       }
       up_cnt = 3;
       while(up_cnt <= 8){
@@ -39,38 +54,38 @@ MOVIE * read_movie_log(MOVIE * mptr){
         switch(up_cnt){
           case 3:
             if(strcmp(tmp_str, "=") != 0)
-              u_mptr->title = tmp_str;
+              updatePointer->title = tmp_str;
             break;
           case 4:
             if(strcmp(tmp_str, "=") != 0)
-              u_mptr->genre = tmp_str;
+              updatePointer->genre = tmp_str;
             break;
           case 5:
             if(strcmp(tmp_str, "=") != 0){
-              u_mptr->director->data_at = tmp_str;
-              u_mptr->director->next = NULL;
+              updatePointer->director->data_at = tmp_str;
+              updatePointer->director->next = NULL;
             }
             break;
           case 6:
             if(strcmp(tmp_str, "=") != 0)
-              u_mptr->year = atoi(tmp_str);
+              updatePointer->year = atoi(tmp_str);
             break;
           case 7:
             if(strcmp(tmp_str, "=") != 0)
-              u_mptr->runtime = atoi(tmp_str);
+              updatePointer->runtime = atoi(tmp_str);
             break;
           case 8:
             if(strcmp(tmp_str, "=") != 0){
-              c_atptr = u_mptr->actors;
+              currentActorsPointer = updatePointer->actors;
               fseek(fp,-strlen(tmp_str), SEEK_CUR);
               while(1){
-                c_atptr->data_at = read(fp, t_data_at);
+                currentActorsPointer->data_at = read(fp, t_data_at);
                 if(fgetc(fp) == '\n'){
-                  c_atptr->next = NULL;
+                  currentActorsPointer->next = NULL;
                   break;
                 }
-                c_atptr->next = (DATA_AT*)malloc(sizeof(DATA_AT));
-                c_atptr = c_atptr->next;
+                currentActorsPointer->next = (DATA_AT*)malloc(sizeof(DATA_AT));
+                currentActorsPointer = currentActorsPointer->next;
               }
             }
             else
@@ -80,92 +95,109 @@ MOVIE * read_movie_log(MOVIE * mptr){
         up_cnt++;
       }
     }
-    else if(strcmp(tmp_tag, "delete") == 0){
-      if(tmp_num == p_mptr->srl_num){
-        u_mptr = mptr;
-        while(u_mptr->next->srl_num < tmp_num){
-          u_mptr = u_mptr->next;
+    else if(strcmp(tag, "delete") == 0){
+      if(srlNum == moviePointer->srl_num){
+        tmpPointer = moviePointer;
+        returnPointer = moviePointer->next;
+      }
+      else{
+        updatePointer = moviePointer;
+        while(1){
+          if(updatePointer->next == NULL)
+            break;
+          if(srlNum == updatePointer->next->srl_num)
+            break;
+          updatePointer = updatePointer->next;
         }
-        p_mptr = u_mptr;
+        tmpPointer = updatePointer->next;
+        updatePointer->next = updatePointer->next->next;
       }
-      mptr = delete_m(fp, mptr, tmp_num);
-    }
-    else{ //add일때
-      if(p_mptr!=NULL){
-        c_mptr = (MOVIE*)malloc(sizeof(MOVIE)); //할당
-        p_mptr->next = c_mptr; // 연결
-      }
-      c_mptr->actors = (DATA_AT*)malloc(sizeof(DATA_AT)); //할당
-      c_mptr->tag=tmp_tag;
-      c_mptr->srl_num=tmp_num;
-      c_mptr->title=read(fp, t_str);
-      c_mptr->genre=read(fp, t_str);
-      c_mptr->director=(DATA_AT*)malloc(sizeof(DATA_AT));
-      c_mptr->director->data_at=read(fp, t_str);
-      c_mptr->director->next=NULL;
-      fscanf(fp,"%d:",&tmp_num);
-      c_mptr->year=tmp_num;
-      fscanf(fp,"%d:",&tmp_num);
-      c_mptr->runtime=tmp_num;
-      c_atptr = c_mptr->actors;
+      updatePointer = (MOVIE*)tmpPointer;
+      free(updatePointer->tag);
+      free(updatePointer->title);
+      free(updatePointer->genre);
+      free(updatePointer->director->data_at);
+      if(updatePointer->director->link != NULL)
+        free(updatePointer->director->link);
+      free(updatePointer->director);
+      currentActorsPointer = updatePointer->actors;
       while(1){
-        c_atptr->data_at = read(fp, t_data_at);
-        if(fgetc(fp) == '\n'){
-          c_atptr->next = NULL;
+        tmpPointer = currentActorsPointer;
+        if(currentActorsPointer->next == NULL){
+          free(((DATA_AT*)tmpPointer)->data_at);
+          free((DATA_AT*)tmpPointer);
           break;
         }
-        c_atptr->next = (DATA_AT*)malloc(sizeof(DATA_AT));
-        c_atptr = c_atptr->next;
+        currentActorsPointer = currentActorsPointer->next;
+        free(((DATA_AT*)tmpPointer)->data_at);
+        free((DATA_AT*)tmpPointer);
       }
-      m_srl = c_mptr->srl_num;
-      p_mptr = c_mptr;
+      free(updatePointer);
+      fseek(fp, 7, SEEK_CUR);
     }
-
-    if(fgetc(fp) == EOF){
-      c_mptr->next = NULL;
-      break;
+    else if(strcmp(tag, "add") == 0){
+      if(previousPointer!=NULL){
+        currentPointer = (MOVIE*)malloc(sizeof(MOVIE)); //할당
+        currentPointer->actors = (DATA_AT*)malloc(sizeof(DATA_AT)); //할당
+        previousPointer->next = currentPointer; // 연결
+      }
+      currentPointer->tag = tag;
+      currentPointer->srl_num=srlNum;
+      currentPointer->title=read(fp, t_str);
+      currentPointer->genre=read(fp, t_str);
+      currentPointer->director=(DATA_AT*)malloc(sizeof(DATA_AT));
+      currentPointer->director->data_at=read(fp, t_str);
+      currentPointer->director->next=NULL;
+      fscanf(fp,"%d:",&tmp_num);
+      currentPointer->year=tmp_num;
+      fscanf(fp,"%d:",&tmp_num);
+      currentPointer->runtime=tmp_num;
+      currentActorsPointer = currentPointer->actors;
+      while(1){
+        currentActorsPointer->data_at = read(fp, t_data_at);
+        if(fgetc(fp) == '\n'){
+          currentActorsPointer->next = NULL;
+          break;
+        }
+        currentActorsPointer->next = (DATA_AT*)malloc(sizeof(DATA_AT));
+        currentActorsPointer = currentActorsPointer->next;
+      }
+      currentPointer->next = NULL;
+      m_srl = currentPointer->srl_num;
     }
+    fgetpos(fp, pos);
+    fgetc(fp);
+    return returnPointer;
+  }
+  else if(type == t_director || type == t_actor){
+    DIR_ACTOR *previousPointer=NULL, *dir_actorPointer = (DIR_ACTOR*)ptr;
+    DIR_ACTOR *currentPointer=NULL, *updatePointer=NULL;
+    void  *tmpPointer = NULL, *returnPointer = ptr;
+    DATA_AT *currentBestmoviesPointer = dir_actorPointer->best_movies;
+    previousPointer = dir_actorPointer;
+    while(1){
+      if(previousPointer->next == NULL)
+        break;
+      previousPointer = previousPointer->next;
+    }
+    if(previousPointer->name == NULL){
+      previousPointer = NULL;
+      currentPointer = dir_actorPointer;
+    }
+    if(*pos == 0)
+      fgetpos(fp, pos);
     else
-      fseek(fp, -1, SEEK_CUR);
-  }
-  return mptr;
-  fclose(fp);
-}
-
-MOVIE * delete_m(FILE * fp, MOVIE * mptr, int tmp_num){
-  MOVIE * u_mptr;
-  if(tmp_num == mptr->srl_num){
-    mptr = mptr->next;
-    u_mptr = mptr;
-  }
-  else{
-    u_mptr = mptr;
-    while(u_mptr->next->srl_num < tmp_num)
-      u_mptr = u_mptr->next;
-    u_mptr->next = u_mptr->next->next;
-  }
-  fseek(fp, 7, SEEK_CUR);
-  return mptr;
-}
-
-DIR_ACTOR * read_da_log(DIR_ACTOR * daptr, Type type){
-  FILE * fp;
-  if (type == t_director)
-    fp = fopen("director_log.txt", "rt");
-  else if (type == t_actor)
-    fp = fopen("actor_log.txt", "rt");
-  int tmp_num, up_cnt;
-  char * tmp_tag, * tmp_str;
-  DIR_ACTOR * p_daptr = NULL, * u_daptr;
-  DIR_ACTOR * c_daptr = daptr;
-  DATA_AT * c_datptr = daptr->best_movies;
-  while(1){
-    tmp_tag=read(fp, t_str);
-    fscanf(fp,"%d:",&tmp_num);
-    if(strcmp(tmp_tag, "update") == 0){
-      u_daptr = daptr;
-      while(u_daptr->srl_num < tmp_num){
-        u_daptr = u_daptr->next;
+      fsetpos(fp, pos);
+    tag=read(fp, t_str);
+    fscanf(fp, "%d:", &srlNum);
+    if(strcmp(tag, "update") == 0){
+      updatePointer = dir_actorPointer;
+      while(1){
+        if(updatePointer->srl_num == srlNum)
+          break;
+        if(updatePointer->next == NULL)
+          break;
+        updatePointer = updatePointer->next;
       }
       up_cnt = 3;
       while(up_cnt <= 6){
@@ -173,29 +205,28 @@ DIR_ACTOR * read_da_log(DIR_ACTOR * daptr, Type type){
         switch(up_cnt){
           case 3:
             if(strcmp(tmp_str, "=") != 0)
-              u_daptr->name = tmp_str;
+              updatePointer->name = tmp_str;
             break;
           case 4:
             if(strcmp(tmp_str, "=") != 0)
-              u_daptr->sex = tmp_str;
+              updatePointer->sex = tmp_str;
             break;
           case 5:
-            if(strcmp(tmp_str, "=") != 0){
-              u_daptr->birth = atoi(tmp_str);
-            }
+            if(strcmp(tmp_str, "=") != 0)
+              updatePointer->birth = atoi(tmp_str);
             break;
           case 6:
             if(strcmp(tmp_str, "=") != 0){
-              c_datptr = u_daptr->best_movies;
+              currentBestmoviesPointer = updatePointer->best_movies;
               fseek(fp,-strlen(tmp_str), SEEK_CUR);
               while(1){
-                c_datptr->data_at = read(fp, t_data_at);
+                currentBestmoviesPointer->data_at = read(fp, t_data_at);
                 if(fgetc(fp) == '\n'){
-                  c_datptr->next = NULL;
+                  currentBestmoviesPointer->next = NULL;
                   break;
                 }
-                c_datptr->next = (DATA_AT*)malloc(sizeof(DATA_AT));
-                c_datptr = c_datptr->next;
+                currentBestmoviesPointer->next = (DATA_AT*)malloc(sizeof(DATA_AT));
+                currentBestmoviesPointer = currentBestmoviesPointer->next;
               }
             }
             else
@@ -205,68 +236,77 @@ DIR_ACTOR * read_da_log(DIR_ACTOR * daptr, Type type){
         up_cnt++;
       }
     }
-    else if(strcmp(tmp_tag, "delete") == 0){
-      if(tmp_num == p_daptr->srl_num){
-        u_daptr = daptr;
-        while(u_daptr->next->srl_num < tmp_num){
-          u_daptr = u_daptr->next;
+    else if(strcmp(tag, "delete") == 0){
+      if(srlNum == dir_actorPointer->srl_num){
+        tmpPointer = dir_actorPointer;
+        returnPointer = dir_actorPointer->next;
+      }
+      else{
+        updatePointer = dir_actorPointer;
+        while(1){
+          if(updatePointer->next == NULL)
+            break;
+          if(srlNum == updatePointer->next->srl_num)
+            break;
+          updatePointer = updatePointer->next;
         }
-        p_daptr = u_daptr;
+        tmpPointer = updatePointer->next;
+        updatePointer->next = updatePointer->next->next;
       }
-      daptr = delete_da(fp, daptr, tmp_num);
-    }
-    else{ //add일때
-      if(p_daptr!=NULL){
-        c_daptr = (DIR_ACTOR*)malloc(sizeof(DIR_ACTOR)); //할당
-        p_daptr->next = c_daptr; // 연결
-      }
-      c_daptr->best_movies = (DATA_AT*)malloc(sizeof(DATA_AT)); //할당
-      c_daptr->tag=tmp_tag;
-      c_daptr->srl_num=tmp_num;
-      c_daptr->name=read(fp, t_str);
-      c_daptr->sex=read(fp, t_str);
-      fscanf(fp,"%d:",&tmp_num);
-      c_daptr->birth=tmp_num;
-      c_datptr = c_daptr->best_movies;
+      updatePointer = (DIR_ACTOR*)tmpPointer;
+      free(updatePointer->tag);
+      free(updatePointer->name);
+      free(updatePointer->sex);
+      currentBestmoviesPointer = updatePointer->best_movies;
       while(1){
-        c_datptr->data_at = read(fp, t_data_at);
-        if(fgetc(fp) == '\n'){
-          c_datptr->next = NULL;
+        tmpPointer = currentBestmoviesPointer;
+        if(currentBestmoviesPointer->next == NULL){
+          free(((DATA_AT*)tmpPointer)->data_at);
+          free((DATA_AT*)tmpPointer);
           break;
         }
-        c_datptr->next = (DATA_AT*)malloc(sizeof(DATA_AT));
-        c_datptr = c_datptr->next;
+        currentBestmoviesPointer = currentBestmoviesPointer->next;
+        free(((DATA_AT*)tmpPointer)->data_at);
+        free((DATA_AT*)tmpPointer);
       }
-      if (type == t_director)
-        d_srl = c_daptr->srl_num;
-      else if (type == t_actor)
-        a_srl = c_daptr->srl_num;
-      p_daptr = c_daptr;
+      free(updatePointer);
+      fseek(fp, 5, SEEK_CUR);
     }
-
-    if(fgetc(fp) == EOF){
-      c_daptr->next = NULL;
-      break;
+    else if(strcmp(tag, "add") == 0){
+      if(previousPointer!=NULL){
+        currentPointer = (DIR_ACTOR*)malloc(sizeof(DIR_ACTOR)); //할당
+        currentPointer->best_movies = (DATA_AT*)malloc(sizeof(DATA_AT)); //할당
+        previousPointer->next = currentPointer; // 연결
+      }
+      currentPointer->tag=tag;
+      currentPointer->srl_num=srlNum;
+      currentPointer->name=read(fp, t_str);
+      currentPointer->sex=read(fp, t_str);
+      fscanf(fp,"%d:",&tmp_num);
+      currentPointer->birth=tmp_num;
+      currentBestmoviesPointer = currentPointer->best_movies;
+      while(1){
+        currentBestmoviesPointer->data_at = read(fp, t_data_at);
+        if(fgetc(fp) == '\n'){
+          currentBestmoviesPointer->next = NULL;
+          break;
+        }
+        currentBestmoviesPointer->next = (DATA_AT*)malloc(sizeof(DATA_AT));
+        currentBestmoviesPointer = currentBestmoviesPointer->next;
+      }
+      currentPointer->next = NULL;
+      if(type == t_director){
+        d_srl = currentPointer->srl_num;
+      }
+      else if(type == t_actor){
+        a_srl = currentPointer->srl_num;
+      }
     }
-    else
-      fseek(fp, -1, SEEK_CUR);
-  }
-  return daptr;
-  fclose(fp);
-}
-
-DIR_ACTOR * delete_da(FILE * fp, DIR_ACTOR * daptr, int tmp_num){
-  DIR_ACTOR * u_daptr;
-  if(tmp_num == daptr->srl_num){
-    daptr = daptr->next;
-    u_daptr = daptr;
+    fgetpos(fp, pos);
+    fgetc(fp);
+    return returnPointer;
   }
   else{
-    u_daptr = daptr;
-    while(u_daptr->next->srl_num < tmp_num)
-      u_daptr = u_daptr->next;
-    u_daptr->next = u_daptr->next->next;
+    printf("error\n");
   }
-  fseek(fp, 5, SEEK_CUR); /////////////// 확인 바람
-  return daptr;
 }
