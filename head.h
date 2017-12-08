@@ -38,7 +38,9 @@ typedef struct director_actor{ // 자기 참조 구조체 : 감독 &배우
 } DIR_ACTOR;
 
 ////////////////////////////
+void startReadLog(void);
 void * readLog(FILE * fp, void * ptr, fpos_t * pos, Type type);
+char * read(FILE * fp, Type type);
 void linkLog(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr);
 char* preArrange(char* cmpstr, char* stdstr);
 ////////////////////////////
@@ -51,6 +53,7 @@ char* changeColon(char* ptr, Type mode);
 void makeList(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr);
 ////////////////////////////
 void Save_File();
+void contrl_C();
 void PrintOption(void * ptr, int srl, Type type);
 void SearchOption(void * ptr, char * str, Type type, int num);
 void saveOption(Type type, void * ptr, char * option, char * filename);
@@ -65,7 +68,7 @@ int compareOptionA(const void * ptr1, const void * ptr2);
 int compareOptionN(const void * ptr1, const void * ptr2);
 int compareOptionS(const void * ptr1, const void * ptr2);
 int compareOptionB(const void * ptr1, const void * ptr2);
-int compareOptionM(const void * ptr1, const void * ptr2
+int compareOptionM(const void * ptr1, const void * ptr2);
 
 ////////////////////////////
 #ifdef GLOBAL_DEF

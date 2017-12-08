@@ -16,6 +16,45 @@ char * read(FILE * fp, Type type){
   return str;
 }
 
+void startReadLog(void){
+  movie = (MOVIE*)malloc(sizeof(MOVIE));
+  movie->actors = (DATA_AT*)malloc(sizeof(DATA_AT));
+  movie->next = NULL;
+  movie->title = NULL;
+  director = (DIR_ACTOR*)malloc(sizeof(DIR_ACTOR));
+  director->best_movies = (DATA_AT*)malloc(sizeof(DATA_AT));
+  director->next = NULL;
+  director->name = NULL;
+  actor = (DIR_ACTOR*)malloc(sizeof(DIR_ACTOR));
+  actor->best_movies = (DATA_AT*)malloc(sizeof(DATA_AT));
+  actor->next = NULL;
+  actor->name = NULL;
+
+  FILE * fp;
+  fp = fopen("movie_log.txt", "rt");
+  while(1){
+    movie=(MOVIE*)readLog(fp, movie, moviePosPtr, t_movie);
+    if(fgetc(fp) == EOF)
+      break;
+  }
+  fclose(fp);
+  fp = fopen("director_log.txt", "rt");
+  while(1){
+    director=(DIR_ACTOR*)readLog(fp, director, directorPosPtr, t_director);
+    if(fgetc(fp) == EOF)
+      break;
+  }
+  fclose(fp);
+  fp = fopen("actor_log.txt", "rt");
+  while(1){
+    actor=(DIR_ACTOR*)readLog(fp, actor, actorPosPtr, t_actor);
+    if(fgetc(fp) == EOF)
+      break;
+  }
+  fclose(fp);
+  return;
+}
+
 void * readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
   char * tag, * tmp_str;
   int srlNum, tmp_num, up_cnt;
@@ -308,5 +347,127 @@ void * readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
   }
   else{
     printf("error\n");
+  }
+}
+
+void linkLog(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){ //함수 사용시 형변환 주의
+  MOVIE * crntMoviePtr = mPtr;
+  DIR_ACTOR * crntDirectorPtr = dPtr;
+  DIR_ACTOR * crntActorPtr = aPtr;
+  DATA_AT * crntMovieActorsPtr = mPtr->actors;
+  DATA_AT * crntDirectorBestTitlesPtr = dPtr->best_movies;
+  DATA_AT * crntActorBestTitlesPtr = aPtr->best_movies;
+  /////////// movie의 director 연결 ///////////
+  crntMoviePtr = mPtr;
+  crntDirectorPtr = dPtr;
+  while(1){ //movie의 director
+    crntDirectorPtr = dPtr;
+    while(1){ //director의 name
+      if(strcmp(crntMoviePtr->director->data_at, crntDirectorPtr->name) == 0){
+        crntMoviePtr->director->link = crntDirectorPtr;
+        break;
+      }
+      else{
+        crntMoviePtr->director->link = NULL;
+      }
+      if(crntDirectorPtr->next == NULL){
+        break;
+      }
+      crntDirectorPtr = crntDirectorPtr->next;
+    }
+    if(crntMoviePtr->next == NULL){
+      break;
+    }
+    crntMoviePtr = crntMoviePtr->next;
+  }
+  /////////// movie의 actor 연결 ///////////
+  crntMoviePtr = mPtr;
+  crntActorPtr = aPtr;
+  while(1){ //movie의 actors
+    crntMovieActorsPtr = crntMoviePtr->actors;
+    while(1){  //movie의 actors의 title
+      crntActorPtr = aPtr;
+      while(1){ //actor의 name
+        if(strcmp(crntMovieActorsPtr->data_at, crntActorPtr->name) == 0){
+          crntMovieActorsPtr->link = crntActorPtr;
+          break;
+        }
+        else{
+          crntMovieActorsPtr->link = NULL;
+        }
+        if(crntActorPtr->next == NULL){
+          break;
+        }
+        crntActorPtr = crntActorPtr->next;
+      }
+      if(crntMovieActorsPtr->next == NULL){
+        break;
+      }
+      crntMovieActorsPtr = crntMovieActorsPtr->next;
+    }
+    if(crntMoviePtr->next == NULL){
+      break;
+    }
+    crntMoviePtr = crntMoviePtr->next;
+  }
+  /////////// actor의 movie 연결 ///////////
+  crntActorPtr = aPtr;
+  crntMoviePtr = mPtr;
+  while(1){ //actor의 best_movies
+    crntActorBestTitlesPtr = crntActorPtr->best_movies;
+    while(1){ //actor의 best_movies의 title
+      crntMoviePtr = mPtr;
+      while(1){ //movie의 title
+        if(strcmp(crntActorBestTitlesPtr->data_at, crntMoviePtr->title) == 0){
+          crntActorBestTitlesPtr->link = crntMoviePtr;
+          break;
+        }
+        else{
+          crntActorBestTitlesPtr->link = NULL;
+        }
+        if(crntMoviePtr->next == NULL){
+          break;
+        }
+        crntMoviePtr = crntMoviePtr->next;
+      }
+      if(crntActorBestTitlesPtr->next == NULL){
+        break;
+      }
+      crntActorBestTitlesPtr = crntActorBestTitlesPtr->next;
+    }
+    if(crntActorPtr->next == NULL){
+      break;
+    }
+    crntActorPtr = crntActorPtr->next;
+  }
+  /////////// director의 movie 연결 ///////////
+  crntDirectorPtr = dPtr;
+  crntMoviePtr = mPtr;
+  while(1){ //director의 best_movies
+    crntDirectorBestTitlesPtr = crntDirectorPtr->best_movies;
+    while(1){ //director의 best_movies의 title
+      crntMoviePtr = mPtr;
+      while(1){ //movie의 title
+        if(strcmp(crntDirectorBestTitlesPtr->data_at, crntMoviePtr->title) == 0){
+          crntDirectorBestTitlesPtr->link = crntMoviePtr;
+          break;
+        }
+        else{
+          crntDirectorBestTitlesPtr->link = NULL;
+        }
+        if(crntMoviePtr->next == NULL){
+          break;
+        }
+        crntMoviePtr = crntMoviePtr->next;
+      }
+      if(crntDirectorBestTitlesPtr->next == NULL){
+        break;
+      }
+      crntDirectorBestTitlesPtr = crntDirectorBestTitlesPtr->next;
+    }
+    if(crntDirectorPtr->next == NULL){
+      break;
+    }
+    crntDirectorPtr = crntDirectorPtr->next;
   }
 }
