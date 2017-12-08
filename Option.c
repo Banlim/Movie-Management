@@ -1,6 +1,5 @@
 #include "head.h"
 
-extern int m_srl, d_srl, a_srl; //마지막 시리얼 넘버 저장 전역 변수
 // add 옵션 함수
 void add(FILE * fp, void * ptr, Type type){
   if(type == t_movie){
