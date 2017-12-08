@@ -25,6 +25,7 @@ void add(FILE * fp, void * ptr, Type type){
     if(excludeSameRecord(moviePointer, title, t_movie) != 0){
       m_srl++;
       fprintf(fp,"add:%d:%s:%s:%s:%d:%d:%s\n",m_srl,title,genre,director,year,runtime,actors);
+      movie=(MOVIE*)readLog(fp, moviePointer, &moviePos, t_movie);
       printf("@@ Done.\n");
     }
     else{
@@ -80,6 +81,7 @@ void add(FILE * fp, void * ptr, Type type){
     if(excludeSameRecord(directorPointer, name, t_director) != 0){
       d_srl++;
       fprintf(fp,"add:%d:%s:%c:%d:%s\n",d_srl,name,sex,birth,best_movies);
+      director=(DIR_ACTOR*)readLog(fp, directorPointer, &directorPos, t_director);
       printf("@@ Done.\n");
     }
     else{
@@ -136,6 +138,7 @@ void add(FILE * fp, void * ptr, Type type){
     if(excludeSameRecord(actorPointer, name, t_director) != 0){
       a_srl++;
       fprintf(fp,"add:%d:%s:%c:%d:%s\n",a_srl,name,sex,birth,best_movies);
+      actor=(DIR_ACTOR*)readLog(fp, actorPointer, &actorPos, t_actor);
       printf("@@ Done.\n");
     }
     else{
@@ -232,6 +235,7 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
     //////////////// 같은 영화 제목 제외 ////////////////
     if(excludeSameRecord(moviePointer, title, t_movie) != 0){
       fprintf(fp,"update:%d:%s:%s:%s:%s:%s:%s\n",srl,title,genre,director,year,runtime,actors);
+      movie=(MOVIE*)readLog(fp, movie, &moviePos, t_movie);
     }
     else{
       printf("same : %s_%s\n",title, moviePointer->title);  // test 출력
@@ -256,7 +260,7 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
         if(strcmp(tmp,"Yes") == 0){
           m_srl++;
           fprintf(fp,"update:%d:%s:%s:%s:%d:%d:%s\n",m_srl,title,genre,director,year,runtime,actors);
-          printf("@@ Done.\n");
+          director=(DIR_ACTOR*)readLog(fp, director, &directorPos, t_director);
           free(tmp);
           break;
         }
@@ -316,6 +320,7 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
     directorPointer = (DIR_ACTOR*)ptr;
     if(excludeSameRecord(directorPointer, name, t_director) != 0){
       fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
+      director=(DIR_ACTOR*)readLog(fp, director, &directorPos, t_director);
     }
     else{
       printf("same : %s_%s\n",name, directorPointer->name);  // test 출력
@@ -341,7 +346,7 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
         if(strcmp(tmp,"Yes") == 0){
           d_srl++;
           fprintf(fp,"update:%d:%s:%c:%d:%s\n",d_srl,name,sex,birth,best_movies);
-          printf("@@ Done.\n");
+          director=(DIR_ACTOR*)readLog(fp, director, &directorPos, t_director);
           free(tmp);
           break;
         }
@@ -400,6 +405,7 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
     actorPointer = (DIR_ACTOR*)ptr;
     if(excludeSameRecord(actorPointer, name, t_director) != 0){
       fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
+      actor=(DIR_ACTOR*)readLog(fp, actor, &actorPos, t_actor);
     }
     else{
       printf("same : %s_%s\n",name, actorPointer->name);  // test 출력
@@ -425,7 +431,7 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
         if(strcmp(tmp,"Yes") == 0){
           d_srl++;
           fprintf(fp,"update:%d:%s:%c:%d:%s\n",d_srl,name,sex,birth,best_movies);
-          printf("@@ Done.\n");
+          actor=(DIR_ACTOR*)readLog(fp, actor, &actorPos, t_actor);
           free(tmp);
           break;
         }
