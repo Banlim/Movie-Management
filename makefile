@@ -1,5 +1,5 @@
-grade: main.o signal.o ReadLog.o SaveLink.o inputTag.o
-	gcc -o test main.o signal.o ReadLog.o SaveLink.o inputTag.o 
+myMovie: main.o signal.o ReadLog.o SaveLink.o inputTag.o
+	gcc -o myMovie main.o signal.o ReadLog.o SaveLink.o inputTag.o
 main.o:
 	gcc -c main.c
 signal.o:
