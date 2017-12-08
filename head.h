@@ -47,8 +47,11 @@ void linkLog(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr);
 char* preArrange(char* cmpstr, char* stdstr);
 ////////////////////////////
 void Input_Tag(MOVIE *, DIR_ACTOR *, DIR_ACTOR *);
+char* Scan_log();
 void add(FILE * fp, void * ptr, Type type);
 void update(FILE * fp, int srl, char * option, void * ptr, Type type);
+int excludeSameRecord(void * ptr, char * compareString, Type type);
+char* changeColon(char* ptr, Type mode);
 void makeList(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr);
 ////////////////////////////
 void Save_File();

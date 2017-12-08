@@ -581,3 +581,64 @@ char* preArrange(char* cmpstr, char* stdstr){
   cmpstr = (char*)realloc(cmpstr, (strlen(stdstr)+1)*sizeof(char));
   strcpy(cmpstr, returnStr);
 }
+
+char* Scan_log(){
+  char *op;
+  char *tmp=(char *)malloc(100);
+  scanf("%[ a-zA-Z,0-9:]",tmp);
+  while(getchar()!='\n');
+  op=(char *)malloc(strlen(tmp)+1);
+  strcpy(op,tmp);
+  op = changeColon(op, t_print);
+  return op;
+}
+
+char* changeColon(char* ptr, Type mode){
+  char* returnPointer = (char*)malloc(1);
+  *returnPointer = '\0';
+  char* prevPointer = ptr;
+  char* crntPointer = ptr;
+  if(mode == t_read){
+    while(1){
+      if(strstr(ptr, "??;") == NULL){
+        return ptr;
+      }
+      else{
+        if(strstr(crntPointer, "??;") != NULL){
+          crntPointer = strstr(crntPointer, "??;");
+          returnPointer = (char*)realloc(returnPointer, sizeof(char)*(crntPointer-prevPointer+1));
+          strncat(returnPointer, prevPointer, crntPointer-prevPointer);
+          strncat(returnPointer, ":", 1);
+          crntPointer+=3;
+          prevPointer = crntPointer;
+        }
+        else{
+          strcat(returnPointer, crntPointer);
+          return returnPointer;
+        }
+      }
+    }
+  }
+  else if(mode == t_print){
+    while(1){
+      if(strstr(ptr, ":") == NULL){
+        return ptr;
+      }
+      else{
+        if(strstr(crntPointer, ":") != NULL){
+          crntPointer = strstr(crntPointer, ":");
+          returnPointer = (char*)realloc(returnPointer, sizeof(char)*(crntPointer-prevPointer+3));
+          strncat(returnPointer, prevPointer, crntPointer-prevPointer);
+          strncat(returnPointer, "??;", 3);
+          crntPointer+=1;
+          prevPointer = crntPointer;
+        }
+        else{
+          strcat(returnPointer, crntPointer);
+          return returnPointer;
+        }
+      }
+    }
+  }
+  free(returnPointer);
+}

@@ -246,17 +246,26 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
         moviePointer->actors = moviePointer->actors->next;
       }
       printf("\n");
-      printf("@@ Do you want to add any way? (Y/N) ");
-      char ch;
-      scanf(" %c",&ch);
-      getchar();
-      if(ch=='Y' || ch=='y'){
-        m_srl++;
-        fprintf(fp,"update:%d:%s:%s:%s:%s:%s:%s\n",srl,title,genre,director,year,runtime,actors);
-        printf("@@ Done.\n");
+      char * ch = NULL, * tmp = NULL;
+      while(1){
+        printf("@@ Do you want to add any way? (Yes/No) ");
+        ch = (char*)malloc(20);
+        scanf("%s",ch);
+        tmp = (char*)malloc((strlen(ch)+1));
+        strcpy(tmp,ch);
+        getchar();
+        if(strcmp(tmp,"Yes") == 0){
+          m_srl++;
+          fprintf(fp,"update:%d:%s:%s:%s:%d:%d:%s\n",m_srl,title,genre,director,year,runtime,actors);
+          printf("@@ Done.\n");
+          free(tmp);
+          break;
+        }
+        else if(strcmp(tmp,"No") == 0){
+          free(tmp);
+          return;
+        }
       }
-      if(ch=='N' || ch=='n')
-      return;
     }
   }
   else if(type == t_director){
@@ -322,16 +331,26 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
         directorPointer->best_movies = directorPointer->best_movies->next;
       }
       printf("\n");
-      printf("@@ Do you want to add any way? (Y/N) ");
-      char ch;
-      scanf(" %c",&ch);
-      getchar();
-      if(ch=='Y' || ch=='y'){
-        d_srl++;
-        fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
+      char * ch = NULL, * tmp = NULL;
+      while(1){
+        printf("@@ Do you want to add any way? (Yes/No) ");
+        ch = (char*)malloc(20);
+        scanf("%s",ch);
+        tmp = (char*)malloc((strlen(ch)+1));
+        strcpy(tmp,ch);
+        getchar();
+        if(strcmp(tmp,"Yes") == 0){
+          d_srl++;
+          fprintf(fp,"update:%d:%s:%c:%d:%s\n",d_srl,name,sex,birth,best_movies);
+          printf("@@ Done.\n");
+          free(tmp);
+          break;
+        }
+        else if(strcmp(tmp,"No") == 0){
+          free(tmp);
+          return;
+        }
       }
-      if(ch=='N' || ch=='n')
-      return;
     }
   }
   else if(type == t_actor){
@@ -396,18 +415,53 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
         actorPointer->best_movies = actorPointer->best_movies->next;
       }
       printf("\n");
-      printf("@@ Do you want to add any way? (Y/N) ");
-      char ch;
-      scanf(" %c",&ch);
-      getchar();
-      if(ch=='Y' || ch=='y'){
-        a_srl++;
-        fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
+      char * ch = NULL, * tmp = NULL;
+      while(1){
+        printf("@@ Do you want to add any way? (Yes/No) ");
+        ch = (char*)malloc(20);
+        scanf("%s",ch);
+        tmp = (char*)malloc((strlen(ch)+1));
+        strcpy(tmp,ch);
+        getchar();
+        if(strcmp(tmp,"Yes") == 0){
+          d_srl++;
+          fprintf(fp,"update:%d:%s:%c:%d:%s\n",d_srl,name,sex,birth,best_movies);
+          printf("@@ Done.\n");
+          free(tmp);
+          break;
+        }
+        else if(strcmp(tmp,"No") == 0){
+          free(tmp);
+          return;
+        }
       }
-      if(ch=='N' || ch=='n')
-      return;
     }
   }
+}
+// 중복 레코드 예외 처리 함수
+int excludeSameRecord(void * ptr, char * compareString, Type type){
+  if(type == t_movie){
+    MOVIE * moviePointer = (MOVIE*)ptr;
+    while(moviePointer->next != NULL){
+      if(strcmp(compareString, moviePointer->title) == 0) return 0;
+      moviePointer = moviePointer->next;
+    }
+  }
+  else if(type == t_director){
+    DIR_ACTOR * directorPointer = ((DIR_ACTOR*)ptr);
+    while(directorPointer->next != NULL){
+      if(strcmp(compareString, directorPointer->name) == 0) return 0;
+      directorPointer= directorPointer->next;
+    }
+  }
+  else if(type == t_actor){
+    DIR_ACTOR * actorPointer = (DIR_ACTOR*)ptr;
+    while(actorPointer->next != NULL){
+      if(strcmp(compareString, actorPointer->name) == 0) return 0;
+      actorPointer = actorPointer->next;
+    }
+  }
+  return 1;
 }
 // PrintOption
 void PrintOption(void * ptr, int srl, Type type){
