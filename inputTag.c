@@ -63,19 +63,25 @@ void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
       strcpy(op1, *(str+1));
       if(strcmp(op1, "m") == 0){
+        fp=fopen("movie_log.txt","at");
         add(fp, movie, t_movie);
+        fclose(fp);
         fp = fopen("movie_log.txt", "rt");
         readLog(fp, movie, moviePosPtr, t_movie);
         fclose(fp);
       }
       else if(strcmp(op1, "d") == 0){
+        fp=fopen("director_log.txt","at");
         add(fp, director, t_director);
+        fclose(fp);
         fp = fopen("director_log.txt", "rt");
         readLog(fp, director, directorPosPtr, t_director);
         fclose(fp);
       }
       else if (strcmp(op1, "a") == 0){
+        fp=fopen("actor_log.txt","at");
         add(fp, actor, t_actor);
+        fclose(fp);
         fp = fopen("actor_log.txt", "rt");
         readLog(fp, actor, actorPosPtr, t_actor);
         fclose(fp);
@@ -653,11 +659,12 @@ char* preArrange(char* cmpstr, char* stdstr){
 char* Scan_log(){
   char *op;
   char *tmp=(char *)malloc(100);
-  scanf("%[ a-zA-Z,0-9:]",tmp);
+  scanf("%[ a-zA-Z,.0-9:]",tmp);
   while(getchar()!='\n');
   op=(char *)malloc(strlen(tmp)+1);
   strcpy(op,tmp);
   op = changeColon(op, t_print);
+  op = (char*)realloc(op, sizeof(char)*(strlen(op)+1));
   return op;
 }
 

@@ -3,13 +3,13 @@
 char * read(FILE * fp, Type type){
   char * str = (char*)malloc(100);
   if(type == t_str){
-    fscanf(fp, "%[ a-zA-Z=?;]:", str);
+    fscanf(fp, "%[ a-zA-Z.=?;]:", str);
   }
   else if(type == t_data_at){
     fscanf(fp, "%[ a-zA-Z0-9.?;]", str);
   }
   else if(type == t_str_all){
-    fscanf(fp, "%[ a-zA-Z0-9=?;]:", str);
+    fscanf(fp, "%[ a-zA-Z0-9.=?;]:", str);
   }
   str = changeColon(str, t_read);
   str = (char*)realloc(str, sizeof(char)*(strlen(str)+1));

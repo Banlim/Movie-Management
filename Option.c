@@ -3,7 +3,6 @@
 // add 옵션 함수
 void add(FILE * fp, void * ptr, Type type){
   if(type == t_movie){
-    fp=fopen("movie_log.txt","at");
     char *title,*genre,*director,*actors;
     int year,runtime;
     printf("title > ");
@@ -22,6 +21,7 @@ void add(FILE * fp, void * ptr, Type type){
     actors=Scan_log();
     //////////////// 같은 영화 제목 제외 ////////////////
     MOVIE * moviePointer = (MOVIE*)ptr;
+    DATA_AT * movieActorsPointer = moviePointer->actors;
     if(excludeSameRecord(moviePointer, title, t_movie) != 0){
       m_srl++;
       fprintf(fp,"add:%d:%s:%s:%s:%d:%d:%s\n",m_srl,title,genre,director,year,runtime,actors);
@@ -29,13 +29,19 @@ void add(FILE * fp, void * ptr, Type type){
     }
     else{
       printf("@@You have the same record in movie list.\n");
-      printf("\t%d:%s:%s:%s:%d:%d:",moviePointer->srl_num,moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
       while(1){
-        printf("%s", moviePointer->actors->data_at);
-        if(moviePointer->actors->next == NULL)
+        if(strcmp(title, moviePointer->title) == 0)
+          break;
+        moviePointer = moviePointer->next;
+      }
+      printf("\t%d:%s:%s:%s:%d:%d:",moviePointer->srl_num,moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
+      movieActorsPointer = moviePointer->actors;
+      while(1){
+        printf("%s", movieActorsPointer->data_at);
+        if(movieActorsPointer->next == NULL)
         break;
         printf(",");
-        moviePointer->actors = moviePointer->actors->next;
+        movieActorsPointer = movieActorsPointer->next;
       }
       printf("\n");
       char * ch = NULL, * tmp = NULL;
@@ -59,10 +65,8 @@ void add(FILE * fp, void * ptr, Type type){
         }
       }
     }
-    fclose(fp);
   }
   else if(type == t_director){
-    fp=fopen("director_log.txt","at");
     char *name,sex,*best_movies;
     int birth;
     printf("name > ");
@@ -77,6 +81,7 @@ void add(FILE * fp, void * ptr, Type type){
     best_movies=Scan_log();
     //////////////// 같은 감독 이름 제외 ////////////////
     DIR_ACTOR * directorPointer = (DIR_ACTOR*)ptr;
+    DATA_AT * directorBestTitlesPointer = directorPointer->best_movies;
     if(excludeSameRecord(directorPointer, name, t_director) != 0){
       d_srl++;
       fprintf(fp,"add:%d:%s:%c:%d:%s\n",d_srl,name,sex,birth,best_movies);
@@ -84,21 +89,27 @@ void add(FILE * fp, void * ptr, Type type){
     }
     else{
       printf("@@You have the same record in director list.\n");
-      printf("\t%d:%s:%s:%d:",directorPointer->srl_num,directorPointer->name,directorPointer->sex,directorPointer->birth);
       while(1){
-        printf("%s", directorPointer->best_movies->data_at);
-        if(directorPointer->best_movies->next == NULL){
+        if(strcmp(name, directorPointer->name) == 0)
+          break;
+        directorPointer = directorPointer->next;
+      }
+      printf("\t%d:%s:%s:%d:",directorPointer->srl_num,directorPointer->name,directorPointer->sex,directorPointer->birth);
+      directorPointer->best_movies;
+      while(1){
+        printf("%s", directorBestTitlesPointer->data_at);
+        if(directorBestTitlesPointer->next == NULL){
           break;
         }
         printf(",");
-        directorPointer->best_movies = directorPointer->best_movies->next;
+        directorBestTitlesPointer = directorBestTitlesPointer->next;
       }
       printf("\n");
       char * ch = NULL, * tmp = NULL;
       while(1){
         printf("@@ Do you want to add any way? (Yes/No) ");
         ch = (char*)malloc(20);
-        scanf(" %s",ch);
+        scanf("%s",ch);
         tmp = (char*)malloc((strlen(ch)+1));
         strcpy(tmp,ch);
         getchar();
@@ -115,10 +126,8 @@ void add(FILE * fp, void * ptr, Type type){
         }
       }
     }
-    fclose(fp);
   }
   else if (type == t_actor){
-    fp=fopen("actor_log.txt","at");
     char *name,sex,*best_movies;
     int birth;
     printf("name > ");
@@ -133,6 +142,7 @@ void add(FILE * fp, void * ptr, Type type){
     best_movies=Scan_log();
     //////////////// 같은 배우 이름 제외 ////////////////
     DIR_ACTOR * actorPointer = (DIR_ACTOR*)ptr;
+    DATA_AT * actorBestTitlesPointer = actorPointer->best_movies;
     if(excludeSameRecord(actorPointer, name, t_director) != 0){
       a_srl++;
       fprintf(fp,"add:%d:%s:%c:%d:%s\n",a_srl,name,sex,birth,best_movies);
@@ -140,14 +150,20 @@ void add(FILE * fp, void * ptr, Type type){
     }
     else{
       printf("@@You have the same record in director list.\n");
-      printf("\t%d:%s:%s:%d:",actorPointer->srl_num,actorPointer->name,actorPointer->sex,actorPointer->birth);
       while(1){
-        printf("%s", actorPointer->best_movies->data_at);
-        if(actorPointer->best_movies->next == NULL){
+        if(strcmp(name, actorPointer->name) == 0)
+          break;
+        actorPointer = actorPointer->next;
+      }
+      printf("\t%d:%s:%s:%d:",actorPointer->srl_num,actorPointer->name,actorPointer->sex,actorPointer->birth);
+      actorBestTitlesPointer = actorPointer->best_movies;
+      while(1){
+        printf("%s", actorBestTitlesPointer->data_at);
+        if(actorBestTitlesPointer->next == NULL){
           break;
         }
         printf(",");
-        actorPointer->best_movies = actorPointer->best_movies->next;
+        actorBestTitlesPointer = actorBestTitlesPointer->next;
       }
       printf("\n");
       char * ch = NULL, * tmp = NULL;
@@ -171,7 +187,6 @@ void add(FILE * fp, void * ptr, Type type){
         }
       }
     }
-    fclose(fp);
   }
 }
 // update 옵션 함수
@@ -229,21 +244,27 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
       }
       i++;
     }
-    moviePointer = (MOVIE*)ptr;
     //////////////// 같은 영화 제목 제외 ////////////////
+    moviePointer = (MOVIE*)ptr;
+    DATA_AT * movieActorsPointer = moviePointer->actors;
     if(excludeSameRecord(moviePointer, title, t_movie) != 0){
       fprintf(fp,"update:%d:%s:%s:%s:%s:%s:%s\n",srl,title,genre,director,year,runtime,actors);
     }
     else{
-      printf("same : %s_%s\n",title, moviePointer->title);  // test 출력
       printf("@@You have the same record in movie list.\n");
-      printf("%d:%s:%s:%s:%d:%d:",moviePointer->srl_num,moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
       while(1){
-        printf("%s", moviePointer->actors->data_at);
-        if(moviePointer->actors->next == NULL)
+        if(strcmp(title, moviePointer->title) == 0)
+          break;
+        moviePointer = moviePointer->next;
+      }
+      printf("%d:%s:%s:%s:%d:%d:",moviePointer->srl_num,moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
+      movieActorsPointer = moviePointer->actors;
+      while(1){
+        printf("%s", movieActorsPointer->data_at);
+        if(movieActorsPointer->next == NULL)
         break;
         printf(",");
-        moviePointer->actors = moviePointer->actors->next;
+        movieActorsPointer = movieActorsPointer->next;
       }
       printf("\n");
       char * ch = NULL, * tmp = NULL;
@@ -256,7 +277,7 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
         getchar();
         if(strcmp(tmp,"Yes") == 0){
           m_srl++;
-          fprintf(fp,"update:%d:%s:%s:%s:%d:%d:%s\n",m_srl,title,genre,director,year,runtime,actors);
+          fprintf(fp,"update:%d:%s:%s:%s:%d:%d:%s\n",srl,title,genre,director,year,runtime,actors);
           free(tmp);
           break;
         }
@@ -315,20 +336,26 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
     }
     //////////////// 같은 감독 이름 제외 ////////////////
     directorPointer = (DIR_ACTOR*)ptr;
+    DATA_AT * directorBestTitlesPointer = directorPointer->best_movies;
     if(excludeSameRecord(directorPointer, name, t_director) != 0){
       fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
     }
     else{
-      printf("same : %s_%s\n",name, directorPointer->name);  // test 출력
       printf("@@You have the same record in director list.\n");
-      printf("%d:%s:%s:%d:",directorPointer->srl_num,directorPointer->name,directorPointer->sex,directorPointer->birth);
       while(1){
-        printf("%s", directorPointer->best_movies->data_at);
-        if(directorPointer->best_movies->next == NULL){
+        if(strcmp(name, directorPointer->name) == 0)
+          break;
+        directorPointer = directorPointer->next;
+      }
+      printf("%d:%s:%s:%d:",directorPointer->srl_num,directorPointer->name,directorPointer->sex,directorPointer->birth);
+      directorPointer->best_movies;
+      while(1){
+        printf("%s", directorBestTitlesPointer->data_at);
+        if(directorBestTitlesPointer->next == NULL){
           break;
         }
         printf(",");
-        directorPointer->best_movies = directorPointer->best_movies->next;
+      directorBestTitlesPointer = directorBestTitlesPointer->next;
       }
       printf("\n");
       char * ch = NULL, * tmp = NULL;
@@ -341,7 +368,7 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
         getchar();
         if(strcmp(tmp,"Yes") == 0){
           d_srl++;
-          fprintf(fp,"update:%d:%s:%c:%d:%s\n",d_srl,name,sex,birth,best_movies);
+          fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
           free(tmp);
           break;
         }
@@ -399,20 +426,26 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
     }
     //////////////// 같은 배우 이름 제외 ////////////////
     actorPointer = (DIR_ACTOR*)ptr;
+    DATA_AT * actorBestTitlesPointer = actorPointer->best_movies;
     if(excludeSameRecord(actorPointer, name, t_director) != 0){
       fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
     }
     else{
-      printf("same : %s_%s\n",name, actorPointer->name);  // test 출력
       printf("@@You have the same record in director list.\n");
-      printf("%d:%s:%s:%d:",actorPointer->srl_num,actorPointer->name,actorPointer->sex,actorPointer->birth);
       while(1){
-        printf("%s", actorPointer->best_movies->data_at);
-        if(actorPointer->best_movies->next == NULL){
+        if(strcmp(name, actorPointer->name) == 0)
+          break;
+        actorPointer = actorPointer->next;
+      }
+      printf("%d:%s:%s:%d:",actorPointer->srl_num,actorPointer->name,actorPointer->sex,actorPointer->birth);
+      actorBestTitlesPointer = actorPointer->best_movies;
+      while(1){
+        printf("%s", actorBestTitlesPointer->data_at);
+        if(actorBestTitlesPointer->next == NULL){
           break;
         }
         printf(",");
-        actorPointer->best_movies = actorPointer->best_movies->next;
+        actorBestTitlesPointer = actorBestTitlesPointer->next;
       }
       printf("\n");
       char * ch = NULL, * tmp = NULL;
@@ -425,7 +458,7 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
         getchar();
         if(strcmp(tmp,"Yes") == 0){
           d_srl++;
-          fprintf(fp,"update:%d:%s:%c:%d:%s\n",d_srl,name,sex,birth,best_movies);
+          fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
           free(tmp);
           break;
         }
@@ -441,22 +474,31 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
 int excludeSameRecord(void * ptr, char * compareString, Type type){
   if(type == t_movie){
     MOVIE * moviePointer = (MOVIE*)ptr;
-    while(moviePointer->next != NULL){
-      if(strcmp(compareString, moviePointer->title) == 0) return 0;
+    while(1){
+      if(strcmp(compareString, moviePointer->title) == 0)
+        return 0;
+      if(moviePointer->next == NULL)
+        break;
       moviePointer = moviePointer->next;
     }
   }
   else if(type == t_director){
-    DIR_ACTOR * directorPointer = ((DIR_ACTOR*)ptr);
-    while(directorPointer->next != NULL){
-      if(strcmp(compareString, directorPointer->name) == 0) return 0;
+    DIR_ACTOR * directorPointer = (DIR_ACTOR*)ptr;
+    while(1){
+      if(strcmp(compareString, directorPointer->name) == 0)
+        return 0;
+      if(directorPointer->next == NULL)
+        break;
       directorPointer= directorPointer->next;
     }
   }
   else if(type == t_actor){
     DIR_ACTOR * actorPointer = (DIR_ACTOR*)ptr;
-    while(actorPointer->next != NULL){
-      if(strcmp(compareString, actorPointer->name) == 0) return 0;
+    while(1){
+      if(strcmp(compareString, actorPointer->name) == 0)
+        return 0;
+      if(actorPointer->next == NULL)
+        break;
       actorPointer = actorPointer->next;
     }
   }
