@@ -3,6 +3,7 @@
 #include "head.h"
 
 int main(){
+  signal(SIGINT, contrl_C);
   printf(">> Welcome to My Movie <<\n");
   printf("File Loading.....\n");
 

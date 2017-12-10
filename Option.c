@@ -25,7 +25,6 @@ void add(FILE * fp, void * ptr, Type type){
     if(excludeSameRecord(moviePointer, title, t_movie) != 0){
       m_srl++;
       fprintf(fp,"add:%d:%s:%s:%s:%d:%d:%s\n",m_srl,title,genre,director,year,runtime,actors);
-      movie=(MOVIE*)readLog(fp, moviePointer, &moviePos, t_movie);
       printf("@@ Done.\n");
     }
     else{
@@ -81,7 +80,6 @@ void add(FILE * fp, void * ptr, Type type){
     if(excludeSameRecord(directorPointer, name, t_director) != 0){
       d_srl++;
       fprintf(fp,"add:%d:%s:%c:%d:%s\n",d_srl,name,sex,birth,best_movies);
-      director=(DIR_ACTOR*)readLog(fp, directorPointer, &directorPos, t_director);
       printf("@@ Done.\n");
     }
     else{
@@ -138,7 +136,6 @@ void add(FILE * fp, void * ptr, Type type){
     if(excludeSameRecord(actorPointer, name, t_director) != 0){
       a_srl++;
       fprintf(fp,"add:%d:%s:%c:%d:%s\n",a_srl,name,sex,birth,best_movies);
-      actor=(DIR_ACTOR*)readLog(fp, actorPointer, &actorPos, t_actor);
       printf("@@ Done.\n");
     }
     else{
@@ -225,6 +222,7 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
       else if(*(option+i)=='\0'){
         break;
       }
+      else if(*(option+i)==' ');
       else{
         printf("Input format is not correct\nupdate m|d|a [option] num\n\t  m : [option] : t g d r y a\n");
         return;
@@ -235,7 +233,6 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
     //////////////// 같은 영화 제목 제외 ////////////////
     if(excludeSameRecord(moviePointer, title, t_movie) != 0){
       fprintf(fp,"update:%d:%s:%s:%s:%s:%s:%s\n",srl,title,genre,director,year,runtime,actors);
-      movie=(MOVIE*)readLog(fp, movie, &moviePos, t_movie);
     }
     else{
       printf("same : %s_%s\n",title, moviePointer->title);  // test 출력
@@ -260,7 +257,6 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
         if(strcmp(tmp,"Yes") == 0){
           m_srl++;
           fprintf(fp,"update:%d:%s:%s:%s:%d:%d:%s\n",m_srl,title,genre,director,year,runtime,actors);
-          director=(DIR_ACTOR*)readLog(fp, director, &directorPos, t_director);
           free(tmp);
           break;
         }
@@ -310,6 +306,7 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
       else if(*(option+i)=='\0'){
         break;
       }
+      else if(*(option+i)==' ');
       else{
         printf("Input format is not correct\nupdate m|d|a [option] num\n\t  d|a : [option] : n b s m\n");
         return;
@@ -320,7 +317,6 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
     directorPointer = (DIR_ACTOR*)ptr;
     if(excludeSameRecord(directorPointer, name, t_director) != 0){
       fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
-      director=(DIR_ACTOR*)readLog(fp, director, &directorPos, t_director);
     }
     else{
       printf("same : %s_%s\n",name, directorPointer->name);  // test 출력
@@ -346,7 +342,6 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
         if(strcmp(tmp,"Yes") == 0){
           d_srl++;
           fprintf(fp,"update:%d:%s:%c:%d:%s\n",d_srl,name,sex,birth,best_movies);
-          director=(DIR_ACTOR*)readLog(fp, director, &directorPos, t_director);
           free(tmp);
           break;
         }
@@ -395,6 +390,7 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
       else if(*(option+i)=='\0'){
         break;
       }
+      else if(*(option+i)==' ');
       else{
         printf("Input format is not correct\nupdate m|d|a [option] num\n\t  d|a : [option] : n b s m\n");
         return;
@@ -405,7 +401,6 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
     actorPointer = (DIR_ACTOR*)ptr;
     if(excludeSameRecord(actorPointer, name, t_director) != 0){
       fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
-      actor=(DIR_ACTOR*)readLog(fp, actor, &actorPos, t_actor);
     }
     else{
       printf("same : %s_%s\n",name, actorPointer->name);  // test 출력
@@ -431,7 +426,6 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
         if(strcmp(tmp,"Yes") == 0){
           d_srl++;
           fprintf(fp,"update:%d:%s:%c:%d:%s\n",d_srl,name,sex,birth,best_movies);
-          actor=(DIR_ACTOR*)readLog(fp, actor, &actorPos, t_actor);
           free(tmp);
           break;
         }
@@ -472,24 +466,24 @@ int excludeSameRecord(void * ptr, char * compareString, Type type){
 void PrintOption(void * ptr, int srl, Type type){
   int i=1;
   DATA_AT * Pointer;
-  MOVIE * linkPointer;
   if(type == t_movie){
+    MOVIE * linkPointer;
     MOVIE * moviePointer = (MOVIE*)ptr;
     DIR_ACTOR * DlinkPointer;
-    while(moviePointer->next != NULL){
+    while(1){
       if(srl == moviePointer->srl_num)
         break;
+      if(moviePointer->next == NULL){
+        printf("@@ No such record.\n");
+        return;
+      }
       moviePointer = moviePointer->next;
-    }
-    if(srl != moviePointer->srl_num){
-      printf("@@ No such record.\n");
-      return;
     }
     printf("%d, %s, %s\n",moviePointer->srl_num, moviePointer->title,moviePointer->genre);
     printf("\tD : %s",moviePointer->director->data_at);
-    DlinkPointer = moviePointer->director->link;
+    DlinkPointer =(DIR_ACTOR*)moviePointer->director->link;
     //////////// director birth 파악 ////////////
-    if(moviePointer->director->link == NULL)
+    if(DlinkPointer == NULL)
       printf("\n");
     else
       printf(" (%d)\n",DlinkPointer->birth);
@@ -509,21 +503,22 @@ void PrintOption(void * ptr, int srl, Type type){
       Pointer = Pointer->next;
     }
   }
-  if(type == t_director){
+  else if(type == t_director){
+    MOVIE * linkPointer;
     DIR_ACTOR * directorPointer = (DIR_ACTOR*)ptr;
-    while(directorPointer->next != NULL){
+    while(1){
       if(srl == directorPointer->srl_num)
         break;
+      if(directorPointer->next == NULL){
+        printf("@@ No such record.\n");
+        return;
+      }
       directorPointer = directorPointer->next;
-    }
-    if(srl != directorPointer->srl_num){
-      printf("@@ No such record.\n");
-      return;
     }
     printf("%d, %s, %s, %d\n",directorPointer->srl_num, directorPointer->name,directorPointer->sex,directorPointer->birth);
     //////////// director best_movies 파악 ////////////
     Pointer = directorPointer->best_movies;
-    linkPointer = directorPointer->best_movies->link;
+    linkPointer = (MOVIE*)directorPointer->best_movies->link;
     while(1){
       printf("\tBest_Movie%d : %s",i,Pointer->data_at);
       if(Pointer->link == NULL)
@@ -538,11 +533,16 @@ void PrintOption(void * ptr, int srl, Type type){
       Pointer = Pointer->next;
     }
   }
-  if(type == t_actor){
+  else if(type == t_actor){
+    MOVIE * linkPointer;
     DIR_ACTOR * actorPointer = (DIR_ACTOR*)ptr;
-    while(actorPointer->next != NULL){
+    while(1){
       if(srl == actorPointer->srl_num)
         break;
+      if(actorPointer->next == NULL){
+        printf("@@ No such record.\n");
+        return;
+      }
       actorPointer = actorPointer->next;
     }
     if(srl != actorPointer->srl_num){
@@ -552,7 +552,7 @@ void PrintOption(void * ptr, int srl, Type type){
     printf("%d, %s, %s, %d\n",actorPointer->srl_num,actorPointer->name,actorPointer->sex,actorPointer->birth);
     //////////// actor best_movies 파악 ////////////
     Pointer = actorPointer->best_movies;
-    linkPointer = actorPointer->best_movies->link;
+    linkPointer = (MOVIE*)actorPointer->best_movies->link;
     while(1){
       printf("\tBest_Movie%d : %s",i,Pointer->data_at);
       if(Pointer->link == NULL)
@@ -949,6 +949,7 @@ void sortOption(Type type, void * ptr, char * option, char * filename){
       qsort(pointerArray, i+1, sizeof(MOVIE*), compareOptionA);
     }
     else{
+      printf("%s is not correct option\n", option);
       return;
     }
     int j = 0;
@@ -1031,6 +1032,7 @@ void sortOption(Type type, void * ptr, char * option, char * filename){
       qsort(pointerArray, i+1, sizeof(DIR_ACTOR*), compareOptionM);
     }
     else{
+      printf("%s is not correct option\n", option);
       return;
     }
     int j = 0;

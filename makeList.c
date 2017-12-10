@@ -18,11 +18,13 @@ void makeList(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
     fprintf(fp,"%s:", crntMoviePtr->director->data_at);
     fprintf(fp,"%d:", crntMoviePtr->year);
     fprintf(fp,"%d:", crntMoviePtr->runtime);
+    crntMovieActorsPtr = crntMoviePtr->actors;
     while(1){
-      fprintf(fp,"%s,", crntMovieActorsPtr->data_at);
+      fprintf(fp,"%s", crntMovieActorsPtr->data_at);
       if(crntMovieActorsPtr->next == NULL){
         break;
       }
+      fprintf(fp,",");
       crntMovieActorsPtr = crntMovieActorsPtr->next;
     }
     fprintf(fp,"\n");
@@ -40,11 +42,13 @@ void makeList(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
     fprintf(fp,"%s:", crntDirectorPtr->name);
     fprintf(fp,"%s:", crntDirectorPtr->sex);
     fprintf(fp,"%d:", crntDirectorPtr->birth);
+    crntDirectorBestTitlesPtr = crntDirectorPtr->best_movies;
     while(1){
-      fprintf(fp,"%s,", crntDirectorBestTitlesPtr->data_at);
+      fprintf(fp,"%s", crntDirectorBestTitlesPtr->data_at);
       if(crntDirectorBestTitlesPtr->next == NULL){
         break;
       }
+      fprintf(fp,",");
       crntDirectorBestTitlesPtr = crntDirectorBestTitlesPtr->next;
     }
     fprintf(fp,"\n");
@@ -62,11 +66,13 @@ void makeList(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
     fprintf(fp,"%s:", crntActorPtr->name);
     fprintf(fp,"%s:", crntActorPtr->sex);
     fprintf(fp,"%d:", crntActorPtr->birth);
+    crntActorBestTitlesPtr = crntActorPtr->best_movies;
     while(1){
-      fprintf(fp,"%s,", crntActorBestTitlesPtr->data_at);
+      fprintf(fp,"%s", crntActorBestTitlesPtr->data_at);
       if(crntActorBestTitlesPtr->next == NULL){
         break;
       }
+      fprintf(fp,",");
       crntActorBestTitlesPtr = crntActorBestTitlesPtr->next;
     }
     fprintf(fp,"\n");

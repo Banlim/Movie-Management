@@ -1,10 +1,10 @@
 #include "head.h"
 //입력 함수
 
-void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
+void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
   char *tag=NULL, *op1=NULL, *op2=NULL, *op3=NULL, *op4=NULL;
   char ** str = NULL;
-  char * tmp = NULL, * tmp_str = NULL;
+  char * tmp = NULL, * tmp_str = NULL, * searchTmp = NULL;
   int i = 0, scanfNum = 0, num = 0, free_num = 0;
   int srl = 0;
   FILE * fp = NULL;
@@ -62,12 +62,24 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
     if(num == 2){
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
       strcpy(op1, *(str+1));
-      if(strcmp(op1, "m") == 0)
+      if(strcmp(op1, "m") == 0){
         add(fp, movie, t_movie);
-      else if(strcmp(op1, "d") == 0)
+        fp = fopen("movie_log.txt", "rt");
+        readLog(fp, movie, moviePosPtr, t_movie);
+        fclose(fp);
+      }
+      else if(strcmp(op1, "d") == 0){
         add(fp, director, t_director);
-      else if (strcmp(op1, "a") == 0)
+        fp = fopen("director_log.txt", "rt");
+        readLog(fp, director, directorPosPtr, t_director);
+        fclose(fp);
+      }
+      else if (strcmp(op1, "a") == 0){
         add(fp, actor, t_actor);
+        fp = fopen("actor_log.txt", "rt");
+        readLog(fp, actor, actorPosPtr, t_actor);
+        fclose(fp);
+      }
       else
         printf("'%s' is not correct option\noption : m d a\n", op1);
     }
@@ -112,6 +124,9 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         else
           printf("Input format is not correct\nupdate m|d|a [option] num\n\t[option] : t g d r y a\n");
         fclose(fp);
+        fp = fopen("movie_log.txt", "rt");
+        readLog(fp, movie, moviePosPtr, t_movie);
+        fclose(fp);
       }
       else if(strcmp(op1, "d") == 0){
         fp=fopen("director_log.txt","at");
@@ -146,6 +161,9 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         }
         else
           printf("Input format is not correct\nupdate m|d|a [option] num\n\t[option] : n s b m\n");
+        fclose(fp);
+        fp = fopen("director_log.txt", "rt");
+        readLog(fp, director, directorPosPtr, t_director);
         fclose(fp);
       }
       else if(strcmp(op1, "a") == 0){
@@ -183,6 +201,9 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         else
           printf("Input format is not correct\nupdate m|d|a [option] num\n\t[option] : n s b m\n");
         fclose(fp);
+        fp = fopen("actor_log.txt", "rt");
+        readLog(fp, actor, actorPosPtr, t_actor);
+        fclose(fp);
       }
       else
         printf("Input format is not correct\nupdate m|d|a [option] num\n\t  m : [option] : t g d r y a\n\td|a : [option] : n s b m\n");
@@ -203,63 +224,69 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
       }
       if(strcmp(op1, "m") == 0){
         while(1){
-          if(movie->srl_num == srl){
+          if(mPtr->srl_num == srl){
             break;
           }
-          if(movie->next == NULL){
+          if(mPtr->next == NULL){
             break;
           }
-          movie = movie->next;
+          mPtr = mPtr->next;
         }
-        if(movie->srl_num != srl){
+        if(mPtr->srl_num != srl){
           printf("@@ No sush record.\n");
           return ;
         }
         fp = fopen("movie_log.txt", "at");
         fprintf(fp, "delete:%d::::::\n", srl);
-        readLog(fp, movie, &moviePos, t_movie);
-        printf("@@ Done.\n");
         fclose(fp);
+        fp = fopen("movie_log.txt", "rt");
+        readLog(fp, movie, moviePosPtr, t_movie);
+        fclose(fp);
+        printf("@@ Done.\n");
       }
       else if(strcmp(op1, "d") == 0){
         while(1){
-          if(director->srl_num == srl){
+          if(dPtr->srl_num == srl){
             break;
           }
-          if(director->next == NULL){
+          if(dPtr->next == NULL){
             break;
           }
-          director = director->next;
+          dPtr = dPtr->next;
         }
-        if(director->srl_num != srl){
+        if(dPtr->srl_num != srl){
           printf("@@ No sush record.\n");
           return ;
         }
         fp = fopen("director_log.txt", "at");
         fprintf(fp, "delete:%d::::\n", srl);
-        readLog(fp, director, &directorPos, t_director);
-        printf("@@ Done.\n");
         fclose(fp);
+        fp = fopen("director_log.txt", "rt");
+        readLog(fp, director, directorPosPtr, t_director);
+        fclose(fp);
+        printf("@@ Done.\n");
       }
       else if(strcmp(op1, "a") == 0){
         while(1){
-          if(actor->srl_num == srl){
+          if(aPtr->srl_num == srl){
             break;
           }
-          if(actor->next == NULL){
+          if(aPtr->next == NULL){
             break;
           }
-          actor = actor->next;
+          aPtr = aPtr->next;
         }
-        if(actor->srl_num != srl){
+        if(aPtr->srl_num != srl){
           printf("@@ No sush record.\n");
           return ;
         }
         fp = fopen("actor_log.txt", "at");
         fprintf(fp, "delete:%d::::\n", srl);
-        readLog(fp, actor, &actorPos, t_actor);
-        printf("@@ Done.\n");
         fclose(fp);
+        fp = fopen("actor_log.txt", "rt");
+        readLog(fp, actor, actorPosPtr, t_actor);
+        fclose(fp);
+        printf("@@ Done.\n");
       }
       else
         printf("'%s' is not correct option\noption : m d a\n", op1);
@@ -321,7 +348,7 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
     else if(num == 3){  // search [option] string
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
       strcpy(op1, *(str+1));
-      if(preArrange(op1 "-mda") == NULL){
+      if(preArrange(op1, "-mda") == NULL){
         printf("%s is not correct option\n", op1);
         return;
       }
@@ -339,7 +366,7 @@ void Input_Tag(MOVIE * movie, DIR_ACTOR * director, DIR_ACTOR * actor){
         else if(*(op1+i) == '\0'){
           break;
         }
-        else if(*(op1+i) == ' ')
+        else if(*(op1+i) == ' ');
         else{
           printf("'%s' is not correct option\n[option] : -m|d|a\n", op1);
           break;

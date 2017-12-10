@@ -38,25 +38,27 @@ typedef struct director_actor{ // 자기 참조 구조체 : 감독 &배우
 } DIR_ACTOR;
 
 ////////////////////////////
-void startReadLog(void);
-void * readLog(FILE * fp, void * ptr, fpos_t * pos, Type type);
 char * read(FILE * fp, Type type);
+void startReadLog(void);
+void readLog(FILE * fp, void * ptr, fpos_t * pos, Type type);
 void linkLog(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr);
-char* preArrange(char* cmpstr, char* stdstr);
 ////////////////////////////
-void Input_Tag(MOVIE *, DIR_ACTOR *, DIR_ACTOR *);
+void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr);
+char* preArrange(char* cmpstr, char* stdstr);
 char* Scan_log();
+char* changeColon(char* ptr, Type mode);
+////////////////////////////
+void makeList(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr);
+void Save_File();
+////////////////////////////
+void contrl_C();
+////////////////////////////
 void add(FILE * fp, void * ptr, Type type);
 void update(FILE * fp, int srl, char * option, void * ptr, Type type);
 int excludeSameRecord(void * ptr, char * compareString, Type type);
-char* changeColon(char* ptr, Type mode);
-void makeList(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr);
-////////////////////////////
-void Save_File();
-void contrl_C();
 void PrintOption(void * ptr, int srl, Type type);
-void SearchOption(void * ptr, char * str, Type type, int num);
 void saveOption(Type type, void * ptr, char * option, char * filename);
+void SearchOption(void * ptr, char * str, Type type, int num);
 void sortOption(Type type, void * ptr, char * option, char * filename);
 ////////////////////////////
 int compareOptionT(const void * ptr1, const void * ptr2);
