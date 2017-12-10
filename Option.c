@@ -23,11 +23,14 @@ void add(FILE * fp, void * ptr, Type type){
     MOVIE * moviePointer = (MOVIE*)ptr;
     DATA_AT * movieActorsPointer = moviePointer->actors;
     if(excludeSameRecord(moviePointer, title, t_movie) != 0){
+      // 같은 레코드가 존재하지 않는다면 현재 시리얼넘버에 1을 더하고
+      // 그 값을 log.txt 파일에 입력한다.
       m_srl++;
       fprintf(fp,"add:%d:%s:%s:%s:%d:%d:%s\n",m_srl,title,genre,director,year,runtime,actors);
       printf("@@ Done.\n");
     }
     else{
+      // 같은 레코드가 존재한다면 해당 레코드의 값을 출력해준다.
       printf("@@You have the same record in movie list.\n");
       while(1){
         if(strcmp(title, moviePointer->title) == 0)
@@ -45,6 +48,8 @@ void add(FILE * fp, void * ptr, Type type){
       }
       printf("\n");
       char * ch = NULL, * tmp = NULL;
+      // Yes 또는 No를 정확하게 입력받기 위해 반복문을 사용하여
+      // 사용자가 정확하게 입력할 때까지 반복한다.
       while(1){
         printf("@@ Do you want to add any way? (Yes/No) ");
         ch = (char*)malloc(20);
@@ -83,11 +88,15 @@ void add(FILE * fp, void * ptr, Type type){
     DIR_ACTOR * directorPointer = (DIR_ACTOR*)ptr;
     DATA_AT * directorBestTitlesPointer = directorPointer->best_movies;
     if(excludeSameRecord(directorPointer, name, t_director) != 0){
+      // 같은 레코드가 존재하지 않는다면 현재 시리얼넘버에 1을 더하고
+      // 그 값을 log.txt 파일에 입력한다.
       d_srl++;
       fprintf(fp,"add:%d:%s:%c:%d:%s\n",d_srl,name,sex,birth,best_movies);
       printf("@@ Done.\n");
     }
     else{
+      // Yes 또는 No를 정확하게 입력받기 위해 반복문을 사용하여
+      // 사용자가 정확하게 입력할 때까지 반복한다.
       printf("@@You have the same record in director list.\n");
       while(1){
         if(strcmp(name, directorPointer->name) == 0)
@@ -144,6 +153,8 @@ void add(FILE * fp, void * ptr, Type type){
     DIR_ACTOR * actorPointer = (DIR_ACTOR*)ptr;
     DATA_AT * actorBestTitlesPointer = actorPointer->best_movies;
     if(excludeSameRecord(actorPointer, name, t_director) != 0){
+      // 같은 레코드가 존재하지 않는다면 현재 시리얼넘버에 1을 더하고
+      // 그 값을 log.txt 파일에 입력한다.
       a_srl++;
       fprintf(fp,"add:%d:%s:%c:%d:%s\n",a_srl,name,sex,birth,best_movies);
       printf("@@ Done.\n");
@@ -168,6 +179,8 @@ void add(FILE * fp, void * ptr, Type type){
       printf("\n");
       char * ch = NULL, * tmp = NULL;
       while(1){
+        // Yes 또는 No를 정확하게 입력받기 위해 반복문을 사용하여
+        // 사용자가 정확하게 입력할 때까지 반복한다.
         printf("@@ Do you want to add any way? (Yes/No) ");
         ch = (char*)malloc(20);
         scanf(" %s",ch);
@@ -193,6 +206,8 @@ void add(FILE * fp, void * ptr, Type type){
 void update(FILE * fp, int srl, char * option, void * ptr, Type type){
   if(type == t_movie){
     MOVIE * moviePointer = (MOVIE*)ptr;
+    // 기본 값인 '='로 초기화 하여 값의 변동이 없을 시
+    // 기본 값으로 자동 입력되게 하였다.
     char *title = "=",*genre = "=",*director = "=",*actors = "=";
     char *year = "=", *runtime = "=";
     int i = 0;
@@ -206,10 +221,12 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
       moviePointer = moviePointer->next;
     }
     if(moviePointer->srl_num != srl){
+      // update 옵션 시 해당 레코드의 존재 여부를 먼저 검사한다.
       printf("@@ No sush record.\n");
       return ;
     }
     while(1){
+      // 해당 옵션 문자열을 하나씩 문자로 비교하여 옵션을 처리한다.
       if(*(option+i)=='t'){
         printf("title > ");
         title=Scan_log();
@@ -248,6 +265,8 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
     moviePointer = (MOVIE*)ptr;
     DATA_AT * movieActorsPointer = moviePointer->actors;
     if(excludeSameRecord(moviePointer, title, t_movie) != 0){
+      // 같은 레코드가 존재하지 않는다면
+      // 그 값을 log.txt 파일에 입력한다.
       fprintf(fp,"update:%d:%s:%s:%s:%s:%s:%s\n",srl,title,genre,director,year,runtime,actors);
     }
     else{
@@ -269,6 +288,8 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
       printf("\n");
       char * ch = NULL, * tmp = NULL;
       while(1){
+        // Yes 또는 No를 정확하게 입력받기 위해 반복문을 사용하여
+        // 사용자가 정확하게 입력할 때까지 반복한다.
         printf("@@ Do you want to add any way? (Yes/No) ");
         ch = (char*)malloc(20);
         scanf("%s",ch);
@@ -338,6 +359,8 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
     directorPointer = (DIR_ACTOR*)ptr;
     DATA_AT * directorBestTitlesPointer = directorPointer->best_movies;
     if(excludeSameRecord(directorPointer, name, t_director) != 0){
+      // 같은 레코드가 존재하지 않는다면
+      // 그 값을 log.txt 파일에 입력한다.
       fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
     }
     else{
@@ -360,6 +383,8 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
       printf("\n");
       char * ch = NULL, * tmp = NULL;
       while(1){
+        // Yes 또는 No를 정확하게 입력받기 위해 반복문을 사용하여
+        // 사용자가 정확하게 입력할 때까지 반복한다.
         printf("@@ Do you want to add any way? (Yes/No) ");
         ch = (char*)malloc(20);
         scanf("%s",ch);
@@ -428,6 +453,8 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
     actorPointer = (DIR_ACTOR*)ptr;
     DATA_AT * actorBestTitlesPointer = actorPointer->best_movies;
     if(excludeSameRecord(actorPointer, name, t_director) != 0){
+      // 같은 레코드가 존재하지 않는다면
+      // 그 값을 log.txt 파일에 입력한다.
       fprintf(fp,"update:%d:%s:%c:%d:%s\n",srl,name,sex,birth,best_movies);
     }
     else{
@@ -450,6 +477,8 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
       printf("\n");
       char * ch = NULL, * tmp = NULL;
       while(1){
+        // Yes 또는 No를 정확하게 입력받기 위해 반복문을 사용하여
+        // 사용자가 정확하게 입력할 때까지 반복한다.
         printf("@@ Do you want to add any way? (Yes/No) ");
         ch = (char*)malloc(20);
         scanf("%s",ch);
@@ -472,6 +501,9 @@ void update(FILE * fp, int srl, char * option, void * ptr, Type type){
 }
 // 중복 레코드 예외 처리 함수
 int excludeSameRecord(void * ptr, char * compareString, Type type){
+  // 각각의 레코드의 타이틀 명이나 감독의 이름, 배우의 이름이 존재여부를 파악하기 위하여
+  // 반복문과 문자열 비교함수인 strcmp() 함수를 사용하여 문자열을 비교한다.
+  // 문자열이 같다면 리턴 값으로 0을 전달한다.
   if(type == t_movie){
     MOVIE * moviePointer = (MOVIE*)ptr;
     while(1){
@@ -513,6 +545,8 @@ void PrintOption(void * ptr, int srl, Type type){
     MOVIE * moviePointer = (MOVIE*)ptr;
     DIR_ACTOR * DlinkPointer;
     while(1){
+      // 해당 시리얼 넘버의 존재여부 파악을 위해
+      // 반복문을 사용하여 해당 레코드를 조사한다.
       if(srl == moviePointer->srl_num)
         break;
       if(moviePointer->next == NULL){
@@ -532,12 +566,15 @@ void PrintOption(void * ptr, int srl, Type type){
     //////////// actor 출력 & actor birth 파악 ////////////
     Pointer = moviePointer->actors;
     while(1){
+      // 해당 배우의 link에 값이 NULL이라면 (-)를 출력하고
+      // 값이 존재한다면 생년월일을 촐력한다.
       printf("\tA%d : %s ",i,Pointer->data_at);
       if(Pointer->link == NULL)
         printf(" (-)\n");
       else
         printf(" (%d)\n", ((DIR_ACTOR*)Pointer->link)->birth);
       if(Pointer->next == NULL){
+        // 배우가 여러명 존재할 때를 위해 다음 next에 값의 존재 여부를 파악한다.
         printf("@@ Done.\n");
         break;
       }
@@ -549,6 +586,8 @@ void PrintOption(void * ptr, int srl, Type type){
     MOVIE * linkPointer;
     DIR_ACTOR * directorPointer = (DIR_ACTOR*)ptr;
     while(1){
+      // 해당 시리얼 넘버의 존재여부 파악을 위해
+      // 반복문을 사용하여 해당 레코드를 조사한다.
       if(srl == directorPointer->srl_num)
         break;
       if(directorPointer->next == NULL){
@@ -562,6 +601,8 @@ void PrintOption(void * ptr, int srl, Type type){
     Pointer = directorPointer->best_movies;
     linkPointer = (MOVIE*)directorPointer->best_movies->link;
     while(1){
+      // 해당 영화의 link에 값이 NULL이라면 아무 것도 출력하지 않고,
+      // 값이 존재한다면 개봉년도와 runtime을 촐력한다.
       printf("\tBest_Movie%d : %s",i,Pointer->data_at);
       if(Pointer->link == NULL)
         printf("\n");
@@ -579,6 +620,8 @@ void PrintOption(void * ptr, int srl, Type type){
     MOVIE * linkPointer;
     DIR_ACTOR * actorPointer = (DIR_ACTOR*)ptr;
     while(1){
+      // 해당 시리얼 넘버의 존재여부 파악을 위해
+      // 반복문을 사용하여 해당 레코드를 조사한다.
       if(srl == actorPointer->srl_num)
         break;
       if(actorPointer->next == NULL){
@@ -596,6 +639,8 @@ void PrintOption(void * ptr, int srl, Type type){
     Pointer = actorPointer->best_movies;
     linkPointer = (MOVIE*)actorPointer->best_movies->link;
     while(1){
+      // 해당 영화의 link에 값이 NULL이라면 아무 것도 출력하지 않고,
+      // 값이 존재한다면 개봉년도와 runtime을 촐력한다.
       printf("\tBest_Movie%d : %s",i,Pointer->data_at);
       if(Pointer->link == NULL)
         printf("\n");
@@ -612,6 +657,9 @@ void PrintOption(void * ptr, int srl, Type type){
 }
 // save 옵션 함수
 void saveOption(Type type, void * ptr, char * option, char * filename){
+  // 옵션을 문자열 option으로 받은 후, 문자열을 차례로 읽으며 해당 정보를 출력한다.
+  // filename이 NULL일 경우에는 디폴트 출력 파일인 list.txt 파일에 출력하고,
+  // 아닌 경우에는 파일에 출력한다.
   FILE * fp = fopen(filename, "wt");
   int end = 0;
   if(type == t_movie){
@@ -733,19 +781,26 @@ void saveOption(Type type, void * ptr, char * option, char * filename){
 void SearchOption(void * ptr, char * str, Type type, int num){
   char * tmp, * cmptmp;
   int i=0,last=0, cmplast=0, cnt=0, strnum=0;
+  // 각각 옵션의 입력여부에 따라 문자열을 나누는 방법이 다르다
   if(num == 0){  //search string
+    // search 를 잘라내고 뒷부분의 string을 tmp에 저장하기 위한 과정이다.
     tmp = strstr(str, " ");
     tmp+=1;
   }
-  if(num == 1){
+  if(num == 1){ //search [option] string
+    // search 를 잘라내고 뒷부분의 string을 tmp에 저장하기 위한 과정이다.
     tmp = strstr(str, " ");
     tmp+=1;
+    // 뒷부분의 string 에서  옵션을 잘라내어 온전한 string을 tmp에 저장하기 위한 과정이다.
+    // 다음 띄어쓰기가 나올때까지 string 문자열에 더하기 1을 해준다.
     while(*(tmp) != ' '){
       tmp+=1;
     }
     tmp+=1;
   }
   if(strcmp(tmp, "*")==0){
+    // string의 값이 메타문자 *일 경우에 모든 레코드 값을 출력해주기 위해
+    // 따로 구분하여 구현하였다.
     if(type == t_movie){
       MOVIE * moviePointer = (MOVIE*)ptr;
       DATA_AT * movieActorsPointer = moviePointer->actors;
@@ -798,6 +853,8 @@ void SearchOption(void * ptr, char * str, Type type, int num){
     return;
   }
   while(1){
+    // 사용자가 메타문자 *의 다중 사용을 막기 위한
+    // 전처리 과정으로 다중 사용 시 return 한다.
     if(*(tmp+i) == '*')
       strnum++;
     if(strnum == 2){
@@ -819,8 +876,8 @@ void SearchOption(void * ptr, char * str, Type type, int num){
       strcpy(cmptmp, moviePointer->title);
       i=0;
       while(1){ // movie의 title 비교 시작
-        if(*(cmptmp+i) == *(tmp+i) || *(tmp+i) == '?'){
-          if(*(tmp+i) == '\0' && *(cmptmp+i) == '\0'){
+        if(*(cmptmp+i) == *(tmp+i) || *(tmp+i) == '?'){ // 값을 하나씩 비교를 하고 메타문자 ?의 경우 한번 지나가기 위해 continue를 사용한다.
+          if(*(tmp+i) == '\0' && *(cmptmp+i) == '\0'){ // 문자열을 끝까지 다 비교하였을 때, 해당 문자열을 출력한다.
             printf("\t%d:%s:%s:%s:%d:%d:",moviePointer->srl_num, moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
             movieActorsPointer = moviePointer->actors;
             while(1){
@@ -838,21 +895,24 @@ void SearchOption(void * ptr, char * str, Type type, int num){
           i++;
           continue;
         }
-        else if(*(tmp+i) == '*'){
+        else if(*(tmp+i) == '*'){ // 해당 값이 매타문자 *일 때
           last = strlen(tmp)-1;
           cmplast = strlen(cmptmp)-1;
-          if(i==0){
+          if(i==0){ // 문자열의 처음이 *로 시작할 때
             while(last != 0){
+              // 문자열의 총 길이를 변수에 저장하여
+              // 문자열의 끝부터 비교하기 시작한다.
               if(*(cmptmp+cmplast) == *(tmp+last) || *(tmp+last) == '?'){
                 last--;
                 cmplast--;
                 continue;
               }
               else{
+                // 값이 다를 경우 break하여 반복문을 빠져나간다.
                 break;
               }
             }
-            if(last == 0){
+            if(last == 0){ // 문자열이 메타문자 * 하나일 경우
               printf("\t%d:%s:%s:%s:%d:%d:",moviePointer->srl_num, moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
               movieActorsPointer = moviePointer->actors;
               while(1){
@@ -868,7 +928,8 @@ void SearchOption(void * ptr, char * str, Type type, int num){
             }
             break;
           }
-          else if(i == last){
+          else if(i == last){ // 문자열의 끝이 *일 때
+            // 해당 레코드를 다 출력한다.
             printf("\t%d:%s:%s:%s:%d:%d:",moviePointer->srl_num, moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
             movieActorsPointer = moviePointer->actors;
             while(1){
@@ -896,10 +957,12 @@ void SearchOption(void * ptr, char * str, Type type, int num){
         break;
       moviePointer = moviePointer->next;
     }
-    if(cnt == 0)
+    if(cnt == 0) // 한번도 레코드를 출력하지 않았다면, 해당 문자열과 같은 레코드를 찾지 못한 것
       printf("@@ No sush record.\n");
   }
   if(type == t_director || type == t_actor){
+    // 감독과 배우의 경우
+    // 영화의 같은 원리를 사용하여 search 옵션을 구현하였다.
     DIR_ACTOR * daPointer = (DIR_ACTOR*)ptr;
     DATA_AT * daBestTitlesPointer = daPointer->best_movies;
     cnt=0;
@@ -999,6 +1062,9 @@ void SearchOption(void * ptr, char * str, Type type, int num){
 }
 // sort 옵션 함수
 void sortOption(Type type, void * ptr, char * option, char * filename){
+  // 옵션을 문자열 option으로 받아서 구조체 포인터 배열을 만든 뒤,
+  // qsort함수를 이용하여 옵션을 기준으로 정렬한다.
+  // filename이 NULL일 경우에는 화면에 출력하고, 아닌 경우에는 파일에 출력한다.
   int i = 0;
   if(type == t_movie){
     MOVIE ** pointerArray = (MOVIE**)malloc(sizeof(MOVIE*)*1);
@@ -1173,18 +1239,22 @@ void sortOption(Type type, void * ptr, char * option, char * filename){
 }
 // compare함수
 int compareOptionT(const void * ptr1, const void * ptr2){
+  //qsort함수에 쓰이는 compare함수로 제목을 비교해 오름 차순으로 반환한다.
   return strcmp((char*)(*(MOVIE**)ptr1)->title, (char*)(*(MOVIE**)ptr2)->title);
 }
 
 int compareOptionG(const void * ptr1, const void * ptr2){
+  //qsort함수에 쓰이는 compare함수로 장르를 비교해 오름 차순으로 반환한다.
   return strcmp((char*)(*(MOVIE**)ptr1)->genre, (char*)(*(MOVIE**)ptr2)->genre);
 }
 
 int compareOptionD(const void * ptr1, const void * ptr2){
+  //qsort함수에 쓰이는 compare함수로 감독 이름을 비교해 오름 차순으로 반환한다.
   return strcmp((char*)((DATA_AT*)(*(MOVIE**)ptr1)->director)->data_at, (char*)((DATA_AT*)(*(MOVIE**)ptr2)->director)->data_at);
 }
 
 int compareOptionY(const void * ptr1, const void * ptr2){
+  //qsort함수에 쓰이는 compare함수로 년도를 비교해 오름 차순으로 반환한다.
   if((int)(*(MOVIE**)ptr1)->year > (int)(*(MOVIE**)ptr2)->year){
     return 1;
   }
@@ -1197,6 +1267,7 @@ int compareOptionY(const void * ptr1, const void * ptr2){
 }
 
 int compareOptionR(const void * ptr1, const void * ptr2){
+  //qsort함수에 쓰이는 compare함수로 상영시간을 비교해 오름 차순으로 반환한다.
   if((int)(*(MOVIE**)ptr1)->runtime > (int)(*(MOVIE**)ptr2)->runtime){
     return 1;
   }
@@ -1209,6 +1280,10 @@ int compareOptionR(const void * ptr1, const void * ptr2){
 }
 
 int compareOptionA(const void * ptr1, const void * ptr2){
+  //qsort함수에 쓰이는 compare함수로 배우를 순서대로 비교해서
+  // 배우끼리 이름이 같은 경우에는 다음 배우 비교로 판단하고
+  // 한쪽이 다음으로 비교될 배우가 없는 경우에는 더 배우 수가 적은 쪽이 우선한다.
+  //배우 이름이 다른 경우에는 오름차순으로 반환한다.
   DATA_AT * cmpPointer1 = (DATA_AT*)(*(MOVIE**)ptr1)->actors;
   DATA_AT * cmpPointer2 = (DATA_AT*)(*(MOVIE**)ptr2)->actors;
   while(1){
@@ -1234,14 +1309,17 @@ int compareOptionA(const void * ptr1, const void * ptr2){
 }
 
 int compareOptionN(const void * ptr1, const void * ptr2){
+  //qsort함수에 쓰이는 compare함수로 이름을 비교해 오름 차순으로 반환한다.
   return strcmp((char*)(*(DIR_ACTOR**)ptr1)->name, (char*)(*(DIR_ACTOR**)ptr2)->name);
 }
 
 int compareOptionS(const void * ptr1, const void * ptr2){
+  //qsort함수에 쓰이는 compare함수로 성별을 비교해 오름 차순으로 반환한다.
   return strcmp((char*)(*(DIR_ACTOR**)ptr1)->sex, (char*)(*(DIR_ACTOR**)ptr2)->sex);
 }
 
 int compareOptionB(const void * ptr1, const void * ptr2){
+  //qsort함수에 쓰이는 compare함수로 생년월일을 비교해 오름 차순으로 반환한다
   if((int)(*(DIR_ACTOR**)ptr1)->birth > (int)(*(DIR_ACTOR**)ptr2)->birth){
     return 1;
   }
@@ -1254,6 +1332,10 @@ int compareOptionB(const void * ptr1, const void * ptr2){
 }
 
 int compareOptionM(const void * ptr1, const void * ptr2){
+  // qsort함수에 쓰이는 compare함수로 제목을 순서대로 비교해서
+  // 제목끼리 이름이 같은 경우에는 다음 영화 제목 비교로 판단하고
+  // 한 쪽이 다음으로 비교될 제목이 없는 경우에는 더 대표작 수가 적은 쪽이 우선한다.
+  // 제목이 다른 경우에는 오름차순으로 반환한다.
   DATA_AT * cmpPointer1 = (DATA_AT*)(*(DIR_ACTOR**)ptr1)->best_movies;
   DATA_AT * cmpPointer2 = (DATA_AT*)(*(DIR_ACTOR**)ptr2)->best_movies;
   while(1){

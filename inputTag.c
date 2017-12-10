@@ -1,6 +1,5 @@
 #include "head.h"
 //입력 함수
-
 void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
   char *tag=NULL, *op1=NULL, *op2=NULL, *op3=NULL, *op4=NULL;
   char ** str = NULL;
@@ -21,14 +20,18 @@ void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
     num=0;
     printf("(movie) ");
     scanfNum = scanf("%[ a-zA-Z0-9*?-:_]", tmp);
+    // search 옵션 구현 시 사용자의 입력 사항을 모두 전달하기 위해
+    // searchTmp 변수에 따로 저장해둔다.
     searchTmp=(char*)malloc(sizeof(strlen(tmp))+1);
     strcpy(searchTmp, tmp);
     while( getchar() != '\n' );
     //예외 처리
     if(scanfNum == 0){
+      // 올바르게 입력된 값이 없다면 break 처리.
       break;
     }
     else{
+      // 사용자의 입력 값을 strtok() 함수를 이용하여 자른다.
       tmp_str = strtok(tmp, " ");
       *(str+num) = (char*)malloc(sizeof(char)*(strlen(tmp_str)+1));
       strcpy(*(str+num), tmp_str);
@@ -53,12 +56,18 @@ void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
   //////////////////////////판단
   i = 0;
   if(num == 0){
+    // 태그 입력 후 옵션 및 문자열의 입력이 없을 경우
+    // return 처리하여 input_Tag() 함수를 종료한다.
     return;
   }
   tag = (char*)malloc(sizeof(char)*(strlen(*str)+1));
   strcpy(tag, *(str));
-  //tag 판단
-  if(strcmp(tag, "add") == 0){
+  //tag 판단을 시작한다.
+  // 각각의 tag를 처리하는 방법으로는 num 변수를 사용하여 각각의 옵션을 나누어 처리한다.
+  // num 변수는 tag 입력 후 옵션 및 문자열의 입력 갯수이다.
+  // 각각의 옵션을 처리하기 위하여 해당 옵션의 함수를 호출하여
+  // 세부 요구 사항을 처리한다.
+  if(strcmp(tag, "add") == 0){ // add 옵션
     if(num == 2){
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
       strcpy(op1, *(str+1));
@@ -92,7 +101,7 @@ void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
     else
       printf("\tInput format is not correct\n\tadd m|d|a\n");
   }
-  else if(strcmp(tag, "update") == 0){
+  else if(strcmp(tag, "update") == 0){ // update 옵션
     if(num != 1 && num != 2){
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
       strcpy(op1, *(str+1));
@@ -217,7 +226,7 @@ void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
     else
       printf("Input format is not correct\nupdate m|d|a [option] num\n\t  m : [option] : t g d r y a\n\td|a : [option] : n s b m\n");
   }
-  else if(strcmp(tag, "delete") == 0){
+  else if(strcmp(tag, "delete") == 0){ // delete 옵션
     if(num == 3){
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
       strcpy(op1, *(str+1));
@@ -300,7 +309,7 @@ void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
     else
       printf("Input format is not correct\ndelete m|d|a num\n");
   }
-  else if(strcmp(tag, "print") == 0){ ////////////////////////////////////////////////////////////////
+  else if(strcmp(tag, "print") == 0){ // print 옵션
     if(num == 3){
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
       strcpy(op1, *(str+1));
@@ -321,7 +330,7 @@ void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
     else
       printf("Input format is not correct\nprint m|d|a num\n");
   }
-  else if(strcmp(tag, "search") == 0){ ////////////////////////////////////////////////////////////////
+  else if(strcmp(tag, "search") == 0){ // search 옵션
     if(num == 1){
       printf("Input format is not correct\nsearch [option] string\n[option] : -m -d -a\n");
       return;
@@ -382,7 +391,7 @@ void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
       printf("@@ Done.\n");
     }
   }
-  else if(strcmp(tag, "sort") == 0){
+  else if(strcmp(tag, "sort") == 0){ // sort 옵션
     if(num == 2){
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
       strcpy(op1, *(str+1));
@@ -479,7 +488,7 @@ void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
     else
       printf("Input format is not correct\nsort m|d|a [option] [-f file_name]\n");
   }
-  else if(strcmp(tag, "save") == 0){
+  else if(strcmp(tag, "save") == 0){ // save 옵션
     if(num == 2){
       op1 = (char*)malloc(sizeof(char)*(strlen(*str+1)+1));
       strcpy(op1, *(str+1));
@@ -613,10 +622,10 @@ void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
     else
       printf("Input format is not correct\nsave m|d|a [option] [-f file_name]\n");
   }
-  else if(strcmp(tag, "end") == 0){
+  else if(strcmp(tag, "end") == 0){ // end 옵션
     exit(0);
   }
-  else
+  else  // 올바른 tag 및 옵션 사용이 아닐 경우
     printf("'%s' is not correct tag\ntag : search, print, add, update, delete, sort, save, end\n", tag);
   //free
   free_num = 0;
@@ -630,6 +639,10 @@ void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
 }
 
 char* preArrange(char* cmpstr, char* stdstr){
+  // cmpstr에는 미리 변환할 문자열을, stdstr에는 변환될 기준이 될 문자열을 받아서
+  // cmpstr에 있는 문자열의 문자들을 stdstr에 있는 문자면 stdstr의 문자의 위치를 기준으로 문자를 넣고,
+  // 만약 stdstr에 있는 문자지만 cmpstr에 없을경우에는 그문자의 위치는 공백으로 남기고 cmpstr를 수정한다.
+  // 단 cmpstr에는 있지만stdstr에 없는 문자나 중복된 문자가 있을경우에는 NULL을 반환한다.
   int cmpLoc = 0, stdLoc = 0, i = 0;
   char * returnStr = (char*)malloc((strlen(stdstr)+1)*sizeof(char));
   for(i = 0; i < strlen(stdstr); i++){
@@ -660,6 +673,7 @@ char* preArrange(char* cmpstr, char* stdstr){
 }
 
 char* Scan_log(){
+  // 사용자의 입력값을 처리하기 위한 함수
   char *op;
   char *tmp=(char *)malloc(100);
   scanf("%[ a-zA-Z,.0-9:]",tmp);
@@ -672,6 +686,10 @@ char* Scan_log(){
 }
 
 char* changeColon(char* ptr, Type mode){
+  // 파일에서 읽은 문자열을 출력하는 경우는 t_print,
+  //사용자에게 입력 받은 경우는 t_read로 mode를 받아서
+  // t_read일경우에는 문자열에서 ??;를 strstr함수로 찾아서 모두 :으로 바꿔준 문자열을 반환하고,
+  // t_print인경우에는 문자열에서 :을 strstr함수로 찾아서 모두 ??;로 바꿔준 문자열을 반환한다.
   char* returnPointer = (char*)malloc(1);
   *returnPointer = '\0';
   char* prevPointer = ptr;
