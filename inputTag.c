@@ -613,6 +613,9 @@ void Input_Tag(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){
     else
       printf("Input format is not correct\nsave m|d|a [option] [-f file_name]\n");
   }
+  else if(strcmp(tag, "end") == 0){
+    exit(0);
+  }
   else
     printf("'%s' is not correct tag\ntag : search, print, add, update, delete, sort, save, end\n", tag);
   //free
