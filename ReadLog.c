@@ -1,6 +1,7 @@
 #include "head.h"
 
 char * read(FILE * fp, Type type){
+  // 각각의 타입에 따라 입력 조건을 처리하여 변수에 저장한다.
   char * str = (char*)malloc(100);
   if(type == t_str){
     fscanf(fp, "%[ a-zA-Z.=?;]:", str);
@@ -11,7 +12,7 @@ char * read(FILE * fp, Type type){
   else if(type == t_str_all){
     fscanf(fp, "%[ a-zA-Z0-9.=?;]:", str);
   }
-  str = changeColon(str, t_read);
+  str = changeColon(str, t_read); // 입력값에 :(콜론)이 있으면 이를 찾아 처리하는 함수 호출
   str = (char*)realloc(str, sizeof(char)*(strlen(str)+1));
   return str;
 }
@@ -29,7 +30,7 @@ void startReadLog(void){
   actor->best_movies = (DATA_AT*)malloc(sizeof(DATA_AT));
   actor->next = NULL;
   actor->name = NULL;
-
+  // 각각의 파일을 열고 파일의 끝까지 readLog함수를 호출하여 각각의 레코드를 형성한다.
   FILE * fp;
   fp = fopen("movie_log.txt", "rt");
   while(1){
@@ -81,6 +82,7 @@ void readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
     fsetpos(fp, pos);
     tag=read(fp, t_str);
     fscanf(fp, "%d:", &srlNum);
+    // update를 처리하기 위해서 같은 시리얼넘버가 있는지 찾는다.
     if(strcmp(tag, "update") == 0){
       updatePointer = movie;
       while(1){
@@ -92,6 +94,7 @@ void readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
       }
       up_cnt = 3;
       while(up_cnt <= 8){
+        // read 함수를 호출하여 파일에 입력된 값을 하나씩 읽어온다.
         tmp_str = read(fp, t_str_all);
         switch(up_cnt){
           case 3:
@@ -138,6 +141,7 @@ void readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
       }
     }
     else if(strcmp(tag, "delete") == 0){
+      // delete를 처리하기 위해 같은 시리얼 넘버가 있는지 찾는다.
       if(srlNum == moviePointer->srl_num){
         tmpPointer = moviePointer;
         movie = movie->next;
@@ -155,6 +159,7 @@ void readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
         updatePointer->next = updatePointer->next->next;
       }
       updatePointer = (MOVIE*)tmpPointer;
+      // delete를 처리하기 위해 메모리를 할당받은 각 구조체를 free 시켜준다.
       free(updatePointer->tag);
       free(updatePointer->title);
       free(updatePointer->genre);
@@ -176,11 +181,13 @@ void readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
       fseek(fp, 7, SEEK_CUR);
     }
     else if(strcmp(tag, "add") == 0){
+      // add 옵션 처리를 위해 메모리를 할당하여 연결시켜준다.
       if(previousPointer!=NULL){
         currentPointer = (MOVIE*)malloc(sizeof(MOVIE)); //할당
         currentPointer->actors = (DATA_AT*)malloc(sizeof(DATA_AT)); //할당
         previousPointer->next = currentPointer; // 연결
       }
+      // read 함수를 통해 값을 읽어와 데이터를 처리하여 준다.
       currentPointer->tag = tag;
       currentPointer->srl_num=srlNum;
       currentPointer->title=read(fp, t_str);
@@ -209,6 +216,9 @@ void readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
     return;
   }
   else if(type == t_director || type == t_actor){
+    // 감독과 배우의 경우 구조체의 형이 같기 때문에 한번에 묶어서 처리하였다.
+    // 전달되는 구조체가 아예 다르기 때문에 else 문에서 따로 구분할 필요는 없다.
+    // 이후의 과정은 영화 구초제의 원리와 같게 처리되어 레코드를 형성한다.
     DIR_ACTOR *previousPointer=NULL, *dir_actorPointer = (DIR_ACTOR*)ptr;
     DIR_ACTOR *currentPointer=NULL, *updatePointer=NULL;
     void  *tmpPointer = NULL;
@@ -360,6 +370,9 @@ void linkLog(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){ //함수 사용�
   DATA_AT * crntDirectorBestTitlesPtr = dPtr->best_movies;
   DATA_AT * crntActorBestTitlesPtr = aPtr->best_movies;
   /////////// movie의 director 연결 ///////////
+  // movie에서 같은 감독의 이름을 비교하여 그 값이 존재한다면
+  // director의 link에 movie의 주소값을 넣어준다.
+  // 그렇지 않으면 NULL값을 할당한다.
   crntMoviePtr = mPtr;
   crntDirectorPtr = dPtr;
   while(1){ //movie의 director
@@ -383,6 +396,9 @@ void linkLog(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){ //함수 사용�
     crntMoviePtr = crntMoviePtr->next;
   }
   /////////// movie의 actor 연결 ///////////
+  // movie에서 같은 배우의 이름을 비교하여 그 값이 존재한다면
+  // actor의 link에 movie의 주소값을 넣어준다.
+  // 그렇지 않으면 NULL값을 할당한다.
   crntMoviePtr = mPtr;
   crntActorPtr = aPtr;
   while(1){ //movie의 actors
@@ -413,6 +429,10 @@ void linkLog(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){ //함수 사용�
     crntMoviePtr = crntMoviePtr->next;
   }
   /////////// actor의 movie 연결 ///////////
+  // 이는 위에서 진행한 과정과 같은 원리로 처리한다.
+  // 배우의 대표작 명과 영화 타이틀을 비교하여 같은 것을 찾으면
+  // 대표작의 link에 영화 레코드의 주소를 할당한다.
+  // 그렇지 않으면 NULL 값을 입력한다.
   crntActorPtr = aPtr;
   crntMoviePtr = mPtr;
   while(1){ //actor의 best_movies
@@ -443,6 +463,10 @@ void linkLog(MOVIE * mPtr, DIR_ACTOR * dPtr, DIR_ACTOR * aPtr){ //함수 사용�
     crntActorPtr = crntActorPtr->next;
   }
   /////////// director의 movie 연결 ///////////
+  // 이는 위에서 진행한 과정과 같은 원리로 처리한다.
+  // 감독의 대표작 명과 영화 타이틀을 비교하여 같은 것을 찾으면
+  // 대표작의 link에 영화 레코드의 주소를 할당한다.
+  // 그렇지 않으면 NULL 값을 입력한다.
   crntDirectorPtr = dPtr;
   crntMoviePtr = mPtr;
   while(1){ //director의 best_movies
