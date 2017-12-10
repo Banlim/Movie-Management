@@ -1,0 +1,6 @@
+add:1:Steven Spielberg:M:19461218:Saving Private Ryan
+add:2:Martin Scorsese:M:19421117:The Wolf of Wall Street
+add:3:Ridely Scott:M:19371130:Blade Runner
+update:1:=:=:=:Saving Private Ryan,Catch Me if You Can,E.T.
+add:4:Martin Scorsese:M:19421117:The Wolf of Wall Street
+delete:2::::
