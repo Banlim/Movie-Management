@@ -33,21 +33,24 @@ void startReadLog(void){
   FILE * fp;
   fp = fopen("movie_log.txt", "rt");
   while(1){
-    movie=(MOVIE*)readLog(fp, movie, moviePosPtr, t_movie);
+    readLog(fp, movie, moviePosPtr, t_movie);
+    fgetc(fp);
     if(fgetc(fp) == EOF)
       break;
   }
   fclose(fp);
   fp = fopen("director_log.txt", "rt");
   while(1){
-    director=(DIR_ACTOR*)readLog(fp, director, directorPosPtr, t_director);
+    readLog(fp, director, directorPosPtr, t_director);
+    fgetc(fp);
     if(fgetc(fp) == EOF)
       break;
   }
   fclose(fp);
   fp = fopen("actor_log.txt", "rt");
   while(1){
-    actor=(DIR_ACTOR*)readLog(fp, actor, actorPosPtr, t_actor);
+    readLog(fp, actor, actorPosPtr, t_actor);
+    fgetc(fp);
     if(fgetc(fp) == EOF)
       break;
   }
@@ -55,13 +58,13 @@ void startReadLog(void){
   return;
 }
 
-void * readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
+void readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
   char * tag, * tmp_str;
   int srlNum, tmp_num, up_cnt;
   if(type == t_movie){
     MOVIE *previousPointer=NULL, *moviePointer = (MOVIE*)ptr;
     MOVIE *currentPointer=NULL, *updatePointer=NULL;
-    void *tmpPointer = NULL, *returnPointer = ptr;
+    void *tmpPointer = NULL;
     DATA_AT *currentActorsPointer = moviePointer->actors;
     previousPointer = moviePointer;
     while(1){
@@ -79,7 +82,7 @@ void * readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
     tag=read(fp, t_str);
     fscanf(fp, "%d:", &srlNum);
     if(strcmp(tag, "update") == 0){
-      updatePointer = moviePointer;
+      updatePointer = movie;
       while(1){
         if(updatePointer->srl_num == srlNum)
           break;
@@ -137,14 +140,14 @@ void * readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
     else if(strcmp(tag, "delete") == 0){
       if(srlNum == moviePointer->srl_num){
         tmpPointer = moviePointer;
-        returnPointer = moviePointer->next;
+        movie = movie->next;
       }
       else{
         updatePointer = moviePointer;
         while(1){
           if(updatePointer->next == NULL)
             break;
-          if(srlNum == updatePointer->next->srl_num)
+          if(updatePointer->next->srl_num == srlNum)
             break;
           updatePointer = updatePointer->next;
         }
@@ -156,8 +159,6 @@ void * readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
       free(updatePointer->title);
       free(updatePointer->genre);
       free(updatePointer->director->data_at);
-      if(updatePointer->director->link != NULL)
-        free(updatePointer->director->link);
       free(updatePointer->director);
       currentActorsPointer = updatePointer->actors;
       while(1){
@@ -205,13 +206,12 @@ void * readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
       m_srl = currentPointer->srl_num;
     }
     fgetpos(fp, pos);
-    fgetc(fp);
-    return returnPointer;
+    return;
   }
   else if(type == t_director || type == t_actor){
     DIR_ACTOR *previousPointer=NULL, *dir_actorPointer = (DIR_ACTOR*)ptr;
     DIR_ACTOR *currentPointer=NULL, *updatePointer=NULL;
-    void  *tmpPointer = NULL, *returnPointer = ptr;
+    void  *tmpPointer = NULL;
     DATA_AT *currentBestmoviesPointer = dir_actorPointer->best_movies;
     previousPointer = dir_actorPointer;
     while(1){
@@ -278,7 +278,10 @@ void * readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
     else if(strcmp(tag, "delete") == 0){
       if(srlNum == dir_actorPointer->srl_num){
         tmpPointer = dir_actorPointer;
-        returnPointer = dir_actorPointer->next;
+        if(type == t_director)
+          director = director->next;
+        else if(type == t_actor)
+          actor = actor->next;
       }
       else{
         updatePointer = dir_actorPointer;
@@ -342,8 +345,7 @@ void * readLog(FILE * fp, void * ptr, fpos_t * pos, Type type){
       }
     }
     fgetpos(fp, pos);
-    fgetc(fp);
-    return returnPointer;
+    return;
   }
   else{
     printf("error\n");
