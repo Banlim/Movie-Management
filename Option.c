@@ -613,10 +613,12 @@ void PrintOption(void * ptr, int srl, Type type){
 // save 옵션 함수
 void saveOption(Type type, void * ptr, char * option, char * filename){
   FILE * fp = fopen(filename, "wt");
+  int end = 0;
   if(type == t_movie){
     MOVIE * moviePointer = (MOVIE*)ptr;
     while(1){
       int i = 0;
+      end = 0;
       while(1){
         if(*(option+i) == 't'){
           fprintf(fp, "%s", moviePointer->title);
@@ -644,11 +646,25 @@ void saveOption(Type type, void * ptr, char * option, char * filename){
             movieActorsPointer = movieActorsPointer->next;
           }
         }
-        if(*(option+i+1) == '\0'){
-          fprintf(fp, "\n");
-          break;
+        int j = 1;
+        while(1){
+          if(*(option+i) == ' ')
+            break;
+          if(*(option+i+j) == '\0'){
+            fprintf(fp, "\n");
+            end = 1;
+            break;
+          }
+          else if(*(option+i+j) == ' '){
+            j++;
+          }
+          else{
+            fprintf(fp, ":");
+            break;
+          }
         }
-        fprintf(fp, ":");
+        if(end == 1)
+          break;
         i++;
       }
       if(moviePointer->next == NULL){
@@ -661,6 +677,7 @@ void saveOption(Type type, void * ptr, char * option, char * filename){
     DIR_ACTOR * diractorPointer = (DIR_ACTOR*)ptr;
     while(1){
       int i = 0;
+      end = 0;
       while(1){
         if(*(option+i) == 'n'){
           fprintf(fp, "%s", diractorPointer->name);
@@ -682,11 +699,25 @@ void saveOption(Type type, void * ptr, char * option, char * filename){
             diractorBestMoviesPointer = diractorBestMoviesPointer->next;
           }
         }
-        if(*(option+i+1) == '\0'){
-          fprintf(fp, "\n");
-          break;
+        int j = 1;
+        while(1){
+          if(*(option+i) == ' ')
+            break;
+          if(*(option+i+j) == '\0'){
+            fprintf(fp, "\n");
+            end = 1;
+            break;
+          }
+          else if(*(option+i+j) == ' '){
+            j++;
+          }
+          else{
+            fprintf(fp, ":");
+            break;
+          }
         }
-        fprintf(fp, ":");
+        if(end == 1)
+          break;
         i++;
       }
       if(diractorPointer->next == NULL){
@@ -717,17 +748,19 @@ void SearchOption(void * ptr, char * str, Type type, int num){
   if(strcmp(tmp, "*")==0){
     if(type == t_movie){
       MOVIE * moviePointer = (MOVIE*)ptr;
+      DATA_AT * movieActorsPointer = moviePointer->actors;
       printf("> Movie_list\n");
       while(1){
         printf("\t%d:%s:%s:%s:%d:%d:",moviePointer->srl_num, moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
+        movieActorsPointer = moviePointer->actors;
         while(1){
-          printf("%s", moviePointer->actors->data_at);
-          if(moviePointer->actors->next == NULL){
+          printf("%s", movieActorsPointer->data_at);
+          if(movieActorsPointer->next == NULL){
             printf("\n");
             break;
           }
           printf(", ");
-          moviePointer->actors = moviePointer->actors->next;
+          movieActorsPointer = movieActorsPointer->next;
         }
         if(moviePointer->next == NULL){
           break;
@@ -737,6 +770,7 @@ void SearchOption(void * ptr, char * str, Type type, int num){
     }
     if(type == t_director || type == t_actor){
       DIR_ACTOR * daPointer = (DIR_ACTOR*)ptr;
+      DATA_AT * daBestTitlesPointer = daPointer->best_movies;
       if(type == t_director){
         printf("> Director_list\n");
       }
@@ -745,14 +779,15 @@ void SearchOption(void * ptr, char * str, Type type, int num){
       }
       while(1){
         printf("\t%d:%s:%s:%d:",daPointer->srl_num, daPointer->name,daPointer->sex,daPointer->birth);
+        daBestTitlesPointer = daPointer->best_movies;
         while(1){
-          printf("%s", daPointer->best_movies->data_at);
-          if(daPointer->best_movies->next == NULL){
+          printf("%s", daBestTitlesPointer->data_at);
+          if(daBestTitlesPointer->next == NULL){
             printf("\n");
             break;
           }
           printf(", ");
-          daPointer->best_movies = daPointer->best_movies->next;
+          daBestTitlesPointer = daBestTitlesPointer->next;
         }
         if(daPointer->next == NULL){
           break;
@@ -775,6 +810,7 @@ void SearchOption(void * ptr, char * str, Type type, int num){
   }
   if(type == t_movie){
     MOVIE * moviePointer = (MOVIE*)ptr;
+    DATA_AT * movieActorsPointer = moviePointer->actors;
     cnt=0;
     printf("> Movie_list\n");
     while(1){  // movie의 title
@@ -786,14 +822,15 @@ void SearchOption(void * ptr, char * str, Type type, int num){
         if(*(cmptmp+i) == *(tmp+i) || *(tmp+i) == '?'){
           if(*(tmp+i) == '\0' && *(cmptmp+i) == '\0'){
             printf("\t%d:%s:%s:%s:%d:%d:",moviePointer->srl_num, moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
+            movieActorsPointer = moviePointer->actors;
             while(1){
-              printf("%s", moviePointer->actors->data_at);
-              if(moviePointer->actors->next == NULL){
+              printf("%s", movieActorsPointer->data_at);
+              if(movieActorsPointer->next == NULL){
                 printf("\n");
                 break;
               }
               printf(", ");
-              moviePointer->actors = moviePointer->actors->next;
+              movieActorsPointer = movieActorsPointer->next;
             }
             cnt++;
             break;
@@ -817,14 +854,15 @@ void SearchOption(void * ptr, char * str, Type type, int num){
             }
             if(last == 0){
               printf("\t%d:%s:%s:%s:%d:%d:",moviePointer->srl_num, moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
+              movieActorsPointer = moviePointer->actors;
               while(1){
-                printf("%s", moviePointer->actors->data_at);
-                if(moviePointer->actors->next == NULL){
+                printf("%s", movieActorsPointer->data_at);
+                if(movieActorsPointer->next == NULL){
                   printf("\n");
                   break;
                 }
                 printf(", ");
-                moviePointer->actors = moviePointer->actors->next;
+                movieActorsPointer = movieActorsPointer->next;
               }
               cnt++;
             }
@@ -832,14 +870,15 @@ void SearchOption(void * ptr, char * str, Type type, int num){
           }
           else if(i == last){
             printf("\t%d:%s:%s:%s:%d:%d:",moviePointer->srl_num, moviePointer->title,moviePointer->genre,moviePointer->director->data_at,moviePointer->year,moviePointer->runtime);
+            movieActorsPointer = moviePointer->actors;
             while(1){
-              printf("%s", moviePointer->actors->data_at);
-              if(moviePointer->actors->next == NULL){
+              printf("%s", movieActorsPointer->data_at);
+              if(movieActorsPointer->next == NULL){
                 printf("\n");
                 break;
               }
               printf(", ");
-              moviePointer->actors = moviePointer->actors->next;
+              movieActorsPointer = movieActorsPointer->next;
             }
             cnt++;
             break;
@@ -862,6 +901,7 @@ void SearchOption(void * ptr, char * str, Type type, int num){
   }
   if(type == t_director || type == t_actor){
     DIR_ACTOR * daPointer = (DIR_ACTOR*)ptr;
+    DATA_AT * daBestTitlesPointer = daPointer->best_movies;
     cnt=0;
     if(type == t_director){
       printf("> Director_list\n");
@@ -878,14 +918,15 @@ void SearchOption(void * ptr, char * str, Type type, int num){
         if(*(cmptmp+i) == *(tmp+i) || *(tmp+i) == '?'){
           if(*(tmp+i) == '\0' && *(cmptmp+i) == '\0'){
             printf("\t%d:%s:%s:%d:",daPointer->srl_num, daPointer->name,daPointer->sex,daPointer->birth);
+            daBestTitlesPointer = daPointer->best_movies;
             while(1){
-              printf("%s", daPointer->best_movies->data_at);
-              if(daPointer->best_movies->next == NULL){
+              printf("%s", daBestTitlesPointer->data_at);
+              if(daBestTitlesPointer->next == NULL){
                 printf("\n");
                 break;
               }
               printf(", ");
-              daPointer->best_movies = daPointer->best_movies->next;
+              daBestTitlesPointer = daBestTitlesPointer->next;
             }
             cnt++;
             break;
@@ -909,14 +950,15 @@ void SearchOption(void * ptr, char * str, Type type, int num){
             }
             if(last == 0){
               printf("\t%d:%s:%s:%d:",daPointer->srl_num, daPointer->name,daPointer->sex,daPointer->birth);
+              daBestTitlesPointer = daPointer->best_movies;
               while(1){
-                printf("%s", daPointer->best_movies->data_at);
-                if(daPointer->best_movies->next == NULL){
+                printf("%s", daBestTitlesPointer->data_at);
+                if(daBestTitlesPointer->next == NULL){
                   printf("\n");
                   break;
                 }
                 printf(", ");
-                daPointer->best_movies = daPointer->best_movies->next;
+                daBestTitlesPointer = daBestTitlesPointer->next;
               }
               cnt++;
             }
@@ -924,14 +966,15 @@ void SearchOption(void * ptr, char * str, Type type, int num){
           }
           else if(i == last){
             printf("\t%d:%s:%s:%d:",daPointer->srl_num, daPointer->name,daPointer->sex,daPointer->birth);
+            daBestTitlesPointer = daPointer->best_movies;
             while(1){
-              printf("%s", daPointer->best_movies->data_at);
-              if(daPointer->best_movies->next == NULL){
+              printf("%s", daBestTitlesPointer->data_at);
+              if(daBestTitlesPointer->next == NULL){
                 printf("\n");
                 break;
               }
               printf(", ");
-              daPointer->best_movies = daPointer->best_movies->next;
+              daBestTitlesPointer = daBestTitlesPointer->next;
             }
             cnt++;
             break;
